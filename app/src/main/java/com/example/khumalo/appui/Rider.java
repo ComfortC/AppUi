@@ -1,6 +1,9 @@
 package com.example.khumalo.appui;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -12,6 +15,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.example.khumalo.appui.Login.LoginActivity;
+import com.example.khumalo.appui.Utils.Constants;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class Rider extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -84,8 +91,14 @@ public class Rider extends AppCompatActivity
             // Handle the camera action
 
 
-        } else if (id == R.id.nav_share) {
-
+        } else if (id == R.id.nav_signOut) {
+            FirebaseAuth.getInstance().signOut();
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putBoolean(Constants.isLoggedIn, false);
+            editor.commit();
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -9,7 +9,7 @@
 
     <item android:title="Account">
         <menu>
-            <item android:id="@+id/nav_share" android:icon="@drawable/ic_action_exit"
+            <item android:id="@+id/nav_signOut" android:icon="@drawable/ic_action_exit"
                 android:title="Sign Out" />
 
         </menu>

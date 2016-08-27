@@ -12,4 +12,24 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_rider">Rider</string>
     <string name="title_activity_main_entry">MainEntry</string>
+
+
+    <string name="web_client_id">794142237576-076buv2lten894gbjde8197hk5fmrckq.apps.googleusercontent.com</string>
+
+
+    <!--    Permissions    -->
+    <string name="permission_rationale_location">Access to the location service is required to enable us to search for available drivers nearby.</string>
+    <string name="location_permission_denied">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
+    <string name="permission_required_toast">Location permission is required for this App.</string>
+    <!-- Instructions and Loading Text -->
+    <string name="progress_dialog_loading">Loading…</string>
+    <string name="progress_dialog_authenticating_with_firebase">Authenticating with Firebase…</string>
+
+    ///
+    <!-- Menu Strings -->
+    <string name="action_logout">Logout</string>
+    <string name="action_share_list">Share List</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_remove_list">Remove list</string>
+    <string name="action_archive">Archive</string>
 </resources>

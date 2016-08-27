@@ -1,0 +1,150 @@
+{
+  "project_info": {
+    "project_number": "794142237576",
+    "firebase_url": "https://handy-sensor-136618.firebaseio.com",
+    "project_id": "handy-sensor-136618",
+    "storage_bucket": "handy-sensor-136618.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794142237576:android:868f68f122e6d107",
+        "android_client_info": {
+          "package_name": "com.example.khumalo.firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "794142237576-doo82i996367o2jdnds4u2c1qof3po3c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.khumalo.firebase",
+            "certificate_hash": "7845508A029E7F5B8F1A34E1ACB1771BA7EBCE40"
+          }
+        },
+        {
+          "client_id": "794142237576-076buv2lten894gbjde8197hk5fmrckq.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "794142237576-sgur9ctip3ce8e63j836ctfpnni6vui3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkiu0SlA1XKeSyB1OuB7s8prwq66X3CoE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794142237576:android:f16eef6dea584503",
+        "android_client_info": {
+          "package_name": "com.example.khumalo.dire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "794142237576-21r0tplcd1t3dulkl8vfn2o6hnn85jia.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.khumalo.dire",
+            "certificate_hash": "7845508A029E7F5B8F1A34E1ACB1771BA7EBCE40"
+          }
+        },
+        {
+          "client_id": "794142237576-076buv2lten894gbjde8197hk5fmrckq.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "794142237576-sgur9ctip3ce8e63j836ctfpnni6vui3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkiu0SlA1XKeSyB1OuB7s8prwq66X3CoE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "794142237576-076buv2lten894gbjde8197hk5fmrckq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794142237576:android:13d78a3b353b6cbc",
+        "android_client_info": {
+          "package_name": "com.example.khumalo.appui"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "794142237576-nou6973cgv4rar0s3l4t4vdn1djq6jl2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.khumalo.appui",
+            "certificate_hash": "7845508A029E7F5B8F1A34E1ACB1771BA7EBCE40"
+          }
+        },
+        {
+          "client_id": "794142237576-076buv2lten894gbjde8197hk5fmrckq.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "794142237576-sgur9ctip3ce8e63j836ctfpnni6vui3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkiu0SlA1XKeSyB1OuB7s8prwq66X3CoE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "794142237576-076buv2lten894gbjde8197hk5fmrckq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
