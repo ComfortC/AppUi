@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.example.khumalo.appui.Login.LoginActivity;
 import com.example.khumalo.appui.Utils.Constants;
@@ -20,14 +21,13 @@ public class MainEntry extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         if (sp.getBoolean(Constants.isLoggedIn, false)) {
-            Random random = new Random();
-            int value = random.nextInt(2)+1;
-            if(value==1){
-                Intent intent = new Intent(this,MainActivity.class);
+            Boolean isChecked = sp.getBoolean(Constants.USER_STATUS,false);
+            if(isChecked){
+                Intent intent = new Intent(this,Rider.class);
                 startActivity(intent);
                 this.finish();
             }else{
-                Intent intent = new Intent(this,Rider.class);
+                Intent intent = new Intent(this,MainActivity.class);
                 startActivity(intent);
                 this.finish();
             }

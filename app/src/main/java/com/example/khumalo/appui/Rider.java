@@ -96,6 +96,7 @@ public class Rider extends AppCompatActivity
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             SharedPreferences.Editor editor = sp.edit();
             editor.putBoolean(Constants.isLoggedIn, false);
+            editor.putBoolean(Constants.USER_STATUS, false);
             editor.commit();
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);

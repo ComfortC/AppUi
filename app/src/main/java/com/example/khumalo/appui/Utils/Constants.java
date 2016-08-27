@@ -34,6 +34,8 @@ public final class Constants {
 
     public static final double TOLERANCE_IN_METERS = 300;
 
+    public static final String USER_STATUS = "userStatus";
+
 
 
 }

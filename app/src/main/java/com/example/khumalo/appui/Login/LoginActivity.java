@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +46,8 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+
 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -183,5 +186,13 @@ public class LoginActivity extends BaseActivity {
                     }
                 });
 
+    }
+
+    public void onCheckBoxClicked(View view) {
+        boolean isChecked = ((CheckBox) view).isChecked();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(Constants.USER_STATUS, isChecked);
+        editor.commit();
     }
 }
