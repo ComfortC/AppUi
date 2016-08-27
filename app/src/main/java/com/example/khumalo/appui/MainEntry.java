@@ -18,9 +18,11 @@ public class MainEntry extends AppCompatActivity {
         if(value==1){
             Intent intent = new Intent(this,MainActivity.class);
             startActivity(intent);
+            this.finish();
         }else{
             Intent intent = new Intent(this,Rider.class);
             startActivity(intent);
+            this.finish();
         }
 
     }
