@@ -4,7 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -24,9 +27,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.khumalo.appui.DriverModel.DriverLocation;
+import com.example.khumalo.appui.DriverModel.DriverProfile;
 import com.example.khumalo.appui.Login.LoginActivity;
 import com.example.khumalo.appui.Utils.Constants;
 import com.example.khumalo.appui.Utils.PermissionUtils;
+import com.example.khumalo.appui.Utils.Utils;
+import com.firebase.client.Firebase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -36,12 +43,29 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
+
+import org.json.JSONException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
+
+import static com.example.khumalo.appui.Utils.Utils.getPolyLineCode;
+import static com.google.maps.android.PolyUtil.decode;
 
 public class Rider extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
@@ -49,13 +73,14 @@ public class Rider extends AppCompatActivity
     GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
     private static final String Tag = "Tag";
-    private static final int LOCATION_INITIAL_PERMISSION_REQUEST_CODE = 1;
     private static final int CURRENT_PLACE_PERMISSION_REQUEST = 2;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3;
     private static final int PLACE_PICKER_REQUEST = 44;
     private boolean mPermissionDenied = false;
     Location mLastLocation;
     String current_Place_extra;
+    String destination;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +89,16 @@ public class Rider extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         buildGoogleClient();
+        if(Utils.getDriverKey(this)==null){
+           addDriver();
+        }
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mMap!=null){
+                    mMap.clear();
+                }
                 buildPlacePickerAutoCompleteDialog();
             }
         });
@@ -88,6 +119,21 @@ public class Rider extends AppCompatActivity
 
     }
 
+    private void addDriver() {
+        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.DRIVERS_URL);
+        Firebase keyRef = database.push();
+        String keyID = keyRef.getKey();
+        Utils.setDriverKey(keyID, this);
+        DriverProfile driver = new DriverProfile("Comfort","Chinondiwana");
+        keyRef.setValue(driver);
+    }
+
+    private void AddLocation(){
+        String keyID = Utils.getDriverKey(this);
+        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(keyID);
+        DriverLocation here = new DriverLocation(-33.9943326,18.4655921);
+        database.setValue(here);
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -235,7 +281,10 @@ public class Rider extends AppCompatActivity
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
-                Log.d(Tag, place.getAddress().toString());
+                destination = place.getId();
+                progressDialog = ProgressDialog.show(this, "Please wait.",
+                        "Searching for your ride...!", true);
+                new DownloadRawData().execute();
             }
         }
     }
@@ -305,4 +354,142 @@ public class Rider extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+    public class DownloadRawData extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            Log.d("Tag", "AsyncTask Called");
+            final String ORIGIN_PARAM = "origin";
+            final String DESTINATION_PARAM = "destination";
+            final String KEY_PARAM = "key";
+            final String REGION_PARAM = "region";
+
+            final String PLACE_ID_PREFIX = "place_id:" + destination;
+
+            Uri builtUri = Uri.parse(Constants.FORECAST_BASE_URL).buildUpon()
+                    .appendQueryParameter(ORIGIN_PARAM, current_Place_extra)
+                    .appendQueryParameter(DESTINATION_PARAM, PLACE_ID_PREFIX)
+                    .appendQueryParameter(REGION_PARAM, Constants.REGION_PARAM)
+                    .appendQueryParameter(KEY_PARAM, getBaseContext().getString(R.string.ApiKey)).build();
+            String Directions = DownloadDirections(builtUri.toString());
+
+            return Directions;
+        }
+
+        @Override
+        protected void onPostExecute(String res) {
+            String thisLocationToDestination="";
+            List<LatLng> polylineToDestination;
+            try {
+                thisLocationToDestination= getPolyLineCode(res);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            progressDialog.dismiss();
+            insertRouteIntoTheDatabase(thisLocationToDestination);
+            polylineToDestination = decode(thisLocationToDestination);
+            int lastPosition = polylineToDestination.size() - 1;
+            drawPolylineCurrentPlaceToDestanation(mMap,polylineToDestination);
+            addMarkerToDestination(mMap, polylineToDestination, lastPosition);
+            addMarkerToDestination(mMap,polylineToDestination,0);
+            moveCameraToPosition(mMap,polylineToDestination,lastPosition);
+        }
+    }
+
+
+
+
+
+    private void addMarkerToDestination(GoogleMap mMap, List<LatLng> polyLocations, int finalPosition) {
+
+        MarkerOptions destination = new MarkerOptions().position(polyLocations.get(finalPosition))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+
+        mMap.addMarker(destination);
+    }
+
+    private void drawPolylineCurrentPlaceToDestanation(GoogleMap mMap, List<LatLng> polyLocations) {
+        PolylineOptions polylineOptions = new PolylineOptions().
+                geodesic(true).
+                color(Color.BLUE).
+                width(10);
+
+        polylineOptions.addAll(polyLocations);
+        mMap.addPolyline(polylineOptions);
+    }
+
+
+    private void insertRouteIntoTheDatabase(String thisLocationToDestination) {
+        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.ROUTES_URL);
+        String keyID = Utils.getDriverKey(getBaseContext());
+        database.child(keyID).setValue(thisLocationToDestination);
+    }
+
+
+    private void moveCameraToPosition(GoogleMap mMap, final List<LatLng> polyLocations, int finalPosition) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(polyLocations.get(0)).include(polyLocations.get(finalPosition));
+        LatLngBounds bounds = builder.build();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150), 4000,null);
+
+    }
+
+    private String DownloadDirections(String Uri){
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        try {
+
+            URL url = new URL(Uri);
+            // Create the request to OpenWeatherMap, and open the connection
+            urlConnection = (HttpURLConnection)url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            // Read the input stream into a String
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
+                // Nothing to do.
+                return "";
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                // But it does make debugging a *lot* easier if you print out the completed
+                // buffer for debugging.
+                buffer.append(line + "\n");
+            }
+
+            if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                return "";
+            }
+
+            return buffer.toString();
+
+
+        } catch (IOException e) {
+            Log.e("Tag", "Error ", e);
+            // If the code didn't successfully get the weather data, there's no point in attemping
+            // to parse it.
+            return " ";
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e("Tag", "Error closing stream", e);
+                }
+            }
+        }
+    }
+
 }

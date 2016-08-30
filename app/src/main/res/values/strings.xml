@@ -15,7 +15,7 @@
 
 
     <string name="web_client_id">794142237576-076buv2lten894gbjde8197hk5fmrckq.apps.googleusercontent.com</string>
-
+    <string name="ApiKey">AIzaSyA_cdmixH5iQvs5x4AD6LSjrCJ10WOM3bI</string>
 
     <!--    Permissions    -->
     <string name="permission_rationale_location">Access to the location service is required to enable us to search for available drivers nearby.</string>
