@@ -13,11 +13,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.khumalo.appui.BackgroundServices.BackgroundLocationService;
 import com.example.khumalo.appui.ClientModel.ClientProfile;
 import com.example.khumalo.appui.DriverModel.*;
 import com.example.khumalo.appui.MainActivity;
@@ -57,6 +62,7 @@ public class GoogleMapFragment extends Fragment implements
     private LocationRequest mLocationRequest;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
+    boolean isLocationServiceOn = true;
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -80,7 +86,47 @@ public class GoogleMapFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+        // Add this line in order for this fragment to handle menu events.
+        setHasOptionsMenu(true);
     }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.map_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            if(isLocationServiceOn) {
+                Log.d("Tag", "The button to stop has been pressed");
+                if (this.mGoogleApiClient != null) {
+                    Intent intent = new Intent(getContext(), CurrentLocationReceiver.class);
+                    PendingIntent locationIntent = PendingIntent.getBroadcast(getContext(), 14872, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, locationIntent);
+                    item.setTitle("Enable Location Share");
+                    isLocationServiceOn = false;
+                }
+            }else {
+                if (this.mGoogleApiClient != null&& mGoogleApiClient.isConnected()) {
+                    requestLocationUpdates();
+                    item.setTitle("Disable Location Share");
+                    isLocationServiceOn = true;
+                }
+
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
