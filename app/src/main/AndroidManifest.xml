@@ -49,6 +49,8 @@
 
         <receiver android:name=".Rider$LocationReceiver" android:enabled="true"/>
 
+        <receiver android:name=".ClientFragments.GoogleMapFragment$CurrentLocationReceiver" android:enabled="true"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC9XTw4airBD9I0KreNRDI1b7I8sTtrKlI" />

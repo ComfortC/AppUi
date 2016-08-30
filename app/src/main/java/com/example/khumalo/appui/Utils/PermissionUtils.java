@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -35,6 +36,19 @@ public abstract class PermissionUtils {
         }
     }
 
+    //Request using fragmentActivity
+    public static void requestPermission(FragmentActivity activity, int requestId,
+                                         String permission, boolean finishActivity) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+            // Display a dialog with rationale.
+            RationaleDialog.newInstance(requestId, finishActivity)
+                    .show(activity.getSupportFragmentManager(), "dialog");
+        } else {
+            // Location permission has not been granted yet, request it.
+            ActivityCompat.requestPermissions(activity, new String[]{permission}, requestId);
+
+        }
+    }
     /**
      * Checks if the result contains a {@link PackageManager#PERMISSION_GRANTED} result for a
      * permission from a runtime permissions request.

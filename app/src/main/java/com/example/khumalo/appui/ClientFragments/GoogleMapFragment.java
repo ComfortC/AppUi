@@ -1,19 +1,38 @@
 package com.example.khumalo.appui.ClientFragments;
 
 
+import android.Manifest;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.khumalo.appui.DriverModel.DriverLocation;
+import com.example.khumalo.appui.MainActivity;
 import com.example.khumalo.appui.R;
+import com.example.khumalo.appui.Utils.PermissionUtils;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -22,12 +41,18 @@ import com.google.android.gms.maps.SupportMapFragment;
  * Use the {@link GoogleMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GoogleMapFragment extends Fragment {
+public class GoogleMapFragment extends Fragment implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
-
+   //Map SetUp
     private SupportMapFragment mSupportMapFragment;
     GoogleMap m_map;
 
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private boolean mPermissionDenied = false;
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -76,9 +101,30 @@ public class GoogleMapFragment extends Fragment {
 
 
         }
+
+        mLocationRequest = LocationRequest.create();
+        // Use high accuracy
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        // Set the update interval to 5 seconds
+        mLocationRequest.setInterval(5000);
+        // Set the fastest update interval to 1 second
+        mLocationRequest.setFastestInterval(3000);
+        buildGoogleApiClient();
         return rootView;
     }
 
+
+    /*
+* Create a new location client, using the enclosing class to
+* handle callbacks.
+*/
+    protected synchronized void buildGoogleApiClient() {
+        this.mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
 
         @Override
         public void onDestroy () {
@@ -86,6 +132,101 @@ public class GoogleMapFragment extends Fragment {
 
         }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        // Request location updates using static settings
+        requestLocationUpdates();
+    }
+
+    private void requestLocationUpdates() {
+
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            PermissionUtils.requestPermission(getActivity(), LOCATION_PERMISSION_REQUEST_CODE,
+                    Manifest.permission.ACCESS_FINE_LOCATION, true);
+        } else {
+            Intent intent = new Intent(getContext(), CurrentLocationReceiver.class);
+
+            PendingIntent locationIntent = PendingIntent.getBroadcast(getContext(), 14872, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            LocationServices.FusedLocationApi.requestLocationUpdates(this.mGoogleApiClient, mLocationRequest, locationIntent);
+
+        }
+    }
+
+   //Permision Results
+   @Override
+   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                          @NonNull int[] grantResults) {
+       if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+           return;
+       }
+
+       if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+               Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+           requestLocationUpdates();
+
+       } else {
+
+           mPermissionDenied = true;
+       }
+   }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mPermissionDenied) {
+            // Permission was not granted, display error dialog.
+            showMissingPermissionError();
+            mPermissionDenied = false;
+        }
+    }
+
+    private void showMissingPermissionError() {
+        PermissionUtils.PermissionDeniedDialog
+                .newInstance(true).show(getChildFragmentManager(), "dialog");
+    }
+
+
+    @Override
+    public void onConnectionSuspended(int i) {
 
     }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+
+    public static class CurrentLocationReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            LocationResult result = LocationResult.extractResult(intent);
+            if(result!=null){
+                double latitude = result.getLastLocation().getLatitude();
+                double longitude = result.getLastLocation().getLongitude();
+                LatLng currentPosition = new LatLng(latitude,longitude);
+                Toast.makeText(context, currentPosition.toString(), Toast.LENGTH_SHORT).show();
+              }
+        }
+    }
+
+}
 
