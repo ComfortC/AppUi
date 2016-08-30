@@ -32,4 +32,5 @@
     <string name="action_sort">Sort</string>
     <string name="action_remove_list">Remove list</string>
     <string name="action_archive">Archive</string>
+    <string name="share_location_choice">Disable Location Share</string>
 </resources>

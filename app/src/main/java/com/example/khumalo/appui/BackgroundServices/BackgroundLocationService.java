@@ -21,6 +21,7 @@ import android.os.PowerManager;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.khumalo.appui.Rider;
 import com.example.khumalo.appui.Utils.Constants;
@@ -76,9 +77,9 @@ public class BackgroundLocationService extends Service implements
         // Use high accuracy
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         // Set the update interval to 5 seconds
-        mLocationRequest.setInterval(5000);
+        mLocationRequest.setInterval(6000);
         // Set the fastest update interval to 1 second
-        mLocationRequest.setFastestInterval(3000);
+        mLocationRequest.setFastestInterval(5000);
 
         servicesAvailable = servicesConnected();
 
@@ -204,20 +205,26 @@ public class BackgroundLocationService extends Service implements
         // Turn off the request flag
         this.mInProgress = false;
 
+
+
+         Toast.makeText(this, DateFormat.getDateTimeInstance().format(new Date()) + ":Disconnected.Please re - connect.", Toast.LENGTH_SHORT).show();
+
+        if (this.mWakeLock != null) {
+            this.mWakeLock.release();
+            this.mWakeLock = null;
+        }
+
+        //Removing location updates
+        Intent intent = new Intent(this, Rider.LocationReceiver.class);
+        PendingIntent locationIntent = PendingIntent.getBroadcast(getApplicationContext(), 14872, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,locationIntent);
+
         if (this.servicesAvailable && this.mGoogleApiClient != null) {
             this.mGoogleApiClient.unregisterConnectionCallbacks(this);
             this.mGoogleApiClient.unregisterConnectionFailedListener(this);
             this.mGoogleApiClient.disconnect();
             // Destroy the current location client
             this.mGoogleApiClient = null;
-        }
-        // Display the connection status
-        // Toast.makeText(this, DateFormat.getDateTimeInstance().format(new Date()) + ":
-        // Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
-
-        if (this.mWakeLock != null) {
-            this.mWakeLock.release();
-            this.mWakeLock = null;
         }
 
         super.onDestroy();

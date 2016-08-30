@@ -85,6 +85,7 @@ public class Rider extends AppCompatActivity
     String current_Place_extra;
     String destination;
     private ProgressDialog progressDialog;
+    boolean isLocationServiceOn = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,6 +205,7 @@ public class Rider extends AppCompatActivity
             current_Place_extra = mLastLocation.getLatitude()+","+mLastLocation.getLongitude();
             Log.d("Tag", "Place co-ordinates are " + current_Place_extra);
             Intent intent = new Intent(this, BackgroundLocationService.class);
+            isLocationServiceOn = true;
             startService(intent);
         }
     }
@@ -323,7 +325,16 @@ public class Rider extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            if(isLocationServiceOn){
+                Log.d(Tag, "The button to stop has been pressed");
+                stopService(new Intent(this, BackgroundLocationService.class));
+                item.setTitle("Enable Location Share");
+                isLocationServiceOn = false;
+            }else {
+                startService(new Intent(this, BackgroundLocationService.class));
+                item.setTitle("Disable Location Share");
+                isLocationServiceOn = true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
