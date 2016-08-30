@@ -1,6 +1,8 @@
 package com.example.khumalo.appui;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -27,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.khumalo.appui.BackgroundServices.BackgroundLocationService;
 import com.example.khumalo.appui.DriverModel.DriverLocation;
 import com.example.khumalo.appui.DriverModel.DriverProfile;
 import com.example.khumalo.appui.Login.LoginActivity;
@@ -38,6 +41,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
@@ -128,12 +132,6 @@ public class Rider extends AppCompatActivity
         keyRef.setValue(driver);
     }
 
-    private void AddLocation(){
-        String keyID = Utils.getDriverKey(this);
-        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(keyID);
-        DriverLocation here = new DriverLocation(-33.9943326,18.4655921);
-        database.setValue(here);
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -205,6 +203,8 @@ public class Rider extends AppCompatActivity
                     mGoogleApiClient);
             current_Place_extra = mLastLocation.getLatitude()+","+mLastLocation.getLongitude();
             Log.d("Tag", "Place co-ordinates are " + current_Place_extra);
+            Intent intent = new Intent(this, BackgroundLocationService.class);
+            startService(intent);
         }
     }
 
@@ -491,5 +491,35 @@ public class Rider extends AppCompatActivity
             }
         }
     }
+
+
+    public static class LocationReceiver extends BroadcastReceiver {
+
+
+
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            LocationResult result = LocationResult.extractResult(intent);
+            if(result!=null){
+                double latitude = result.getLastLocation().getLatitude();
+                double longitude = result.getLastLocation().getLongitude();
+                LatLng currentPosition = new LatLng(latitude,longitude);
+                Toast.makeText(context,currentPosition.toString(),Toast.LENGTH_SHORT).show();
+                DriverLocation here = new DriverLocation(latitude, longitude);
+                addLocation(here,context);
+            }
+        }
+
+
+    }
+    private static void addLocation(DriverLocation driverLocation, Context context){
+        String keyID = Utils.getDriverKey(context);
+        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(keyID);
+        database.setValue(driverLocation);
+    }
+
+
 
 }

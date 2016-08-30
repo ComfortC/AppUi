@@ -4,9 +4,6 @@ package com.example.khumalo.appui.Utils;
  * Created by KHUMALO on 8/15/2016.
  */
 public final class Constants {
-    private Constants() {
-
-    }
 
     public static final String PACKAGE_NAME = "com.example.khumalo.dire";
     public static final String BROADCAST_ACTION = PACKAGE_NAME + ".BROADCAST_ACTION";
@@ -37,6 +34,31 @@ public final class Constants {
     public static final String USER_STATUS = "userStatus";
 
 
+    //Location Services constants
+    // Milliseconds per second
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    // Update frequency in seconds
+    private static final int UPDATE_INTERVAL_IN_SECONDS = 60;
+    // Update frequency in milliseconds
+    public static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
+    // The fastest update frequency, in seconds
+    private static final int FASTEST_INTERVAL_IN_SECONDS = 60;
+    // A fast frequency ceiling in milliseconds
+    public static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
+    // Stores the lat / long pairs in a text file
+    public static final String LOCATION_FILE = "sdcard/location.txt";
+    // Stores the connect / disconnect data in a text file
+    public static final String LOG_FILE = "sdcard/log.txt";
+
+
+
+
+    /**
+     * Suppress default constructor for noninstantiability
+     */
+    private Constants() {
+        throw new AssertionError();
+    }
 
 }
 
