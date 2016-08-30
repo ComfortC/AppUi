@@ -90,6 +90,16 @@ public class GoogleMapFragment extends Fragment implements
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem bedMenuItem = menu.findItem(R.id.action_settings);
+        if(isLocationServiceOn){
+            bedMenuItem.setTitle("Disable Location Share");
+        }else{
+            bedMenuItem.setTitle("Enable Location Share");
+        }
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
