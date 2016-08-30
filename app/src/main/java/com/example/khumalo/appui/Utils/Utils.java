@@ -226,6 +226,19 @@ public class Utils {
     }
 
 
+    //set Client Key
+    public  static void setClientKey(String key, Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.CLIENT_KEY,key);
+        editor.commit();
+    }
+
+   //get Client Key
+    public  static String getClientKey(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(Constants.CLIENT_KEY,null);
+    }
 
     //Determining if they can share
     //Testing if the two points are found on the path

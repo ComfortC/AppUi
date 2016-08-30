@@ -525,6 +525,7 @@ public class Rider extends AppCompatActivity
 
 
     }
+
     private static void addLocation(DriverLocation driverLocation, Context context){
         String keyID = Utils.getDriverKey(context);
         Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(keyID);

@@ -18,10 +18,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.khumalo.appui.DriverModel.DriverLocation;
+import com.example.khumalo.appui.ClientModel.ClientProfile;
+import com.example.khumalo.appui.DriverModel.*;
 import com.example.khumalo.appui.MainActivity;
 import com.example.khumalo.appui.R;
+import com.example.khumalo.appui.Utils.Constants;
 import com.example.khumalo.appui.Utils.PermissionUtils;
+import com.example.khumalo.appui.Utils.Utils;
+import com.firebase.client.Firebase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -102,6 +106,10 @@ public class GoogleMapFragment extends Fragment implements
 
         }
 
+          if(Utils.getClientKey(getContext())==null){
+            addClient();
+          }
+
         mLocationRequest = LocationRequest.create();
         // Use high accuracy
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -111,6 +119,16 @@ public class GoogleMapFragment extends Fragment implements
         mLocationRequest.setFastestInterval(3000);
         buildGoogleApiClient();
         return rootView;
+    }
+
+
+    private void addClient() {
+        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.CLIENTS_URL);
+        Firebase keyRef = database.push();
+        String keyID = keyRef.getKey();
+        Utils.setClientKey(keyID, getContext());
+        ClientProfile clientProfile = new ClientProfile("Kamatoto","Chinos");
+        keyRef.setValue(clientProfile);
     }
 
 
@@ -224,8 +242,16 @@ public class GoogleMapFragment extends Fragment implements
                 double longitude = result.getLastLocation().getLongitude();
                 LatLng currentPosition = new LatLng(latitude,longitude);
                 Toast.makeText(context, currentPosition.toString(), Toast.LENGTH_SHORT).show();
+                DriverLocation clientLocation = new DriverLocation(latitude,longitude);
+                addLocation(clientLocation,context);
               }
         }
+    }
+
+    private static void addLocation(DriverLocation driverLocation, Context context){
+        String keyID = Utils.getClientKey(context);
+        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(keyID);
+        database.setValue(driverLocation);
     }
 
 }
