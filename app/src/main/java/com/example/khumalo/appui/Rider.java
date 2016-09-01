@@ -235,32 +235,22 @@ public class Rider extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        if (requestCode == CURRENT_PLACE_PERMISSION_REQUEST) {
-            if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Log.d(Tag, "The Location Access has been Granted");
-                requestLastKnownLocation();
-
-            } else {
-                // Display the missing permission error dialog when the fragments resume.
-                mPermissionDenied = true;
-            }
-        } else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (requestCode == CURRENT_PLACE_PERMISSION_REQUEST) {
-                if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
                     Log.d(Tag, "The Location Access has been Granted");
+                    requestLastKnownLocation();
+
+            } else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                     buildPlacePickerAutoCompleteDialog();
 
-                } else {
-                    // Display the missing permission error dialog when the fragments resume.
-                    mPermissionDenied = true;
-                }
-
+            }else if(requestCode== Constants.MY_LOCATION_REQUEST_CODE){
+                    makeMyLocationEnabled(mMap);
             }
 
-        }else if(requestCode== Constants.MY_LOCATION_REQUEST_CODE){
-            makeMyLocationEnabled(mMap);
+        } else {
+            mPermissionDenied =true;
         }
     }
 

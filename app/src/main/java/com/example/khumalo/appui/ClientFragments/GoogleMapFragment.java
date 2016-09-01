@@ -3,6 +3,7 @@ package com.example.khumalo.appui.ClientFragments;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,11 +40,15 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -76,6 +82,8 @@ public class GoogleMapFragment extends Fragment implements
     private LocationRequest mLocationRequest;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
+    private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3;
+    private static final int PLACE_PICKER_REQUEST = 44;
 
     private DriverRoute myDriver;
     /**
@@ -165,14 +173,15 @@ public class GoogleMapFragment extends Fragment implements
             @Override
             public void onClick(View view) {
                 Log.d("Tag","Fab clicked");
-                if(myDriver!=null){
+                buildPlacePickerAutoCompleteDialog();
+                /*if(myDriver!=null){
                     List<LatLng> polyLocations= myDriver.getWayLatLongPolyline();
                     int lastPostion = polyLocations.size()-1;
                     addMarkerToDestination(m_map,polyLocations,lastPostion);
                     addMarkerToDestination(m_map,polyLocations,0);
                     drawPolylineCurrentPlaceToDestanation(m_map, polyLocations);
                     moveCameraToPosition(m_map,polyLocations,lastPostion);
-                }
+                }*/
             }
         });
         mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -199,7 +208,7 @@ public class GoogleMapFragment extends Fragment implements
             addClient();
           }
 
-       searchForMyRide();
+        searchForMyRide();
 
         mLocationRequest = LocationRequest.create();
         // Use high accuracy
@@ -345,17 +354,16 @@ public class GoogleMapFragment extends Fragment implements
    @Override
    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                           @NonNull int[] grantResults) {
-       if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-           if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-                   Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-               requestLocationUpdates();
-
+       if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+               Manifest.permission.ACCESS_FINE_LOCATION)) {
+           if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+                requestLocationUpdates();
+           } else if(requestCode==Constants.MY_LOCATION_REQUEST_CODE) {
+               makeMyLocationEnabled(m_map);
+           }else if(requestCode==PLACE_AUTOCOMPLETE_REQUEST_CODE){
+               buildPlacePickerAutoCompleteDialog();
            }
-       } else if(requestCode==Constants.MY_LOCATION_REQUEST_CODE) {
-
-           makeMyLocationEnabled(m_map);
-       }else {
+       } else {
            mPermissionDenied = true;
        }
    }
@@ -409,6 +417,48 @@ public class GoogleMapFragment extends Fragment implements
         String keyID = Utils.getClientKey(context);
         Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(keyID);
         database.setValue(driverLocation);
+    }
+
+
+
+    ///Building Place AutoComplete without a Dialog
+    private void buildPlacePickerAutoCompleteDialog() {
+        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission to access the location is missing.
+            PermissionUtils.requestPermission(getActivity(), PLACE_AUTOCOMPLETE_REQUEST_CODE,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION, true);
+
+        } else {
+            Log.d("Tag", "The Location Access has been Granted");
+            try {
+                Toast toast = Toast.makeText(getContext(), "What's your destination?", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.show();
+                LatLngBounds CapeTown = new LatLngBounds(new LatLng(-34.307222, 18.416507), new LatLng(-30.892878, 24.217288));
+                Intent intent =
+                        new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                .setBoundsBias(CapeTown)
+                                .build(getActivity());
+                startActivityForResult(intent, PLACE_PICKER_REQUEST);
+            } catch (GooglePlayServicesRepairableException e) {
+                // TODO: Handle the error.
+            } catch (GooglePlayServicesNotAvailableException e) {
+                // TODO: Handle the error.
+            }
+
+        }
+    }
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == getActivity().RESULT_OK ) {
+                Place place = PlaceAutocomplete.getPlace(getActivity(), data);
+                Log.d("Tag", place.getAddress().toString());
+
+            }
+        }
     }
 
 }
