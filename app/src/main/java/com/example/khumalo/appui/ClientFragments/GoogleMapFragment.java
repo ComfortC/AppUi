@@ -158,6 +158,7 @@ public class GoogleMapFragment extends Fragment implements
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     m_map = googleMap;
+                    makeMyLocationEnabled(m_map);
                 }
             });
 
@@ -226,6 +227,18 @@ public class GoogleMapFragment extends Fragment implements
         // Request location updates using static settings
         if (Utils.isLocationShared(getContext())) {
             requestLocationUpdates();
+
+        }
+    }
+
+   private void makeMyLocationEnabled(GoogleMap map){
+        if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission to access the location is missing.
+            PermissionUtils.requestPermission(getActivity(), Constants.MY_LOCATION_REQUEST_CODE,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION, true);
+        }else {
+            map.setMyLocationEnabled(true);
         }
     }
 
@@ -248,17 +261,17 @@ public class GoogleMapFragment extends Fragment implements
    @Override
    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                           @NonNull int[] grantResults) {
-       if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
-           return;
-       }
+       if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+           if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+                   Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-       if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-               Manifest.permission.ACCESS_FINE_LOCATION)) {
+               requestLocationUpdates();
 
-           requestLocationUpdates();
+           }
+       } else if(requestCode==Constants.MY_LOCATION_REQUEST_CODE) {
 
-       } else {
-
+           makeMyLocationEnabled(m_map);
+       }else {
            mPermissionDenied = true;
        }
    }

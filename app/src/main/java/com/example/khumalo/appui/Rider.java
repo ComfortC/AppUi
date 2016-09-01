@@ -142,6 +142,7 @@ public class Rider extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        makeMyLocationEnabled(mMap);
     }
 
 
@@ -196,9 +197,22 @@ public class Rider extends AppCompatActivity
 
         if (Utils.isLocationShared(this)) {
             requestLastKnownLocation();
+
         }
 
     }
+
+    private void makeMyLocationEnabled(GoogleMap map){
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission to access the location is missing.
+            PermissionUtils.requestPermission(this, Constants.MY_LOCATION_REQUEST_CODE,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION, true);
+        }else {
+            map.setMyLocationEnabled(true);
+        }
+    }
+
 
     private void requestLastKnownLocation() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -245,6 +259,8 @@ public class Rider extends AppCompatActivity
 
             }
 
+        }else if(requestCode== Constants.MY_LOCATION_REQUEST_CODE){
+            makeMyLocationEnabled(mMap);
         }
     }
 

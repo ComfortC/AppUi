@@ -37,6 +37,7 @@ public final class Constants {
     public static final String LOCATION_SHARE_STATUS = "locationShareStatus";
     public static final String LOCATION_SHARE_STATUS_FLAG = "locationStatusFlag" ;
 
+    public static final int MY_LOCATION_REQUEST_CODE = 25;
     //Location Services constants
     // Milliseconds per second
     private static final int MILLISECONDS_PER_SECOND = 1000;

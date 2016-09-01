@@ -1,14 +1,21 @@
 package com.example.khumalo.appui.Utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
+import com.example.khumalo.appui.BackgroundServices.BackgroundLocationService;
 import com.example.khumalo.appui.Model.Distance;
 import com.example.khumalo.appui.Model.Duration;
 import com.example.khumalo.appui.Model.Leg;
 import com.example.khumalo.appui.Model.Step;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -289,5 +296,7 @@ public class Utils {
         loc.setLongitude(latLng.longitude);
         return loc;
     }
+
+
 
 }
