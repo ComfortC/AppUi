@@ -69,6 +69,7 @@ import java.net.URL;
 import java.util.List;
 
 import static com.example.khumalo.appui.Utils.Utils.getPolyLineCode;
+import static com.example.khumalo.appui.Utils.Utils.isLocationShared;
 import static com.google.maps.android.PolyUtil.decode;
 
 public class Rider extends AppCompatActivity
@@ -85,12 +86,16 @@ public class Rider extends AppCompatActivity
     String current_Place_extra;
     String destination;
     private ProgressDialog progressDialog;
-    boolean isLocationServiceOn = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rider);
+        if (Utils.isLocationStatusNotSet(this)) {
+            Utils.setLocationShareStatus(this, true);
+            Utils.setLocationStatuFlag(this,false);
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         buildGoogleClient();
@@ -188,7 +193,10 @@ public class Rider extends AppCompatActivity
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(Tag, "The client has been connected");
-        requestLastKnownLocation();
+
+        if (Utils.isLocationShared(this)) {
+            requestLastKnownLocation();
+        }
 
     }
 
@@ -205,7 +213,6 @@ public class Rider extends AppCompatActivity
             current_Place_extra = mLastLocation.getLatitude()+","+mLastLocation.getLongitude();
             Log.d("Tag", "Place co-ordinates are " + current_Place_extra);
             Intent intent = new Intent(this, BackgroundLocationService.class);
-            isLocationServiceOn = true;
             startService(intent);
         }
     }
@@ -317,6 +324,20 @@ public class Rider extends AppCompatActivity
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem bedMenuItem = menu.findItem(R.id.action_settings);
+        if(Utils.isLocationShared(this)){
+            bedMenuItem.setTitle("Disable Location Share");
+            return true;
+        }else{
+            bedMenuItem.setTitle("Enable Location Share");
+            return true;
+        }
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -325,15 +346,15 @@ public class Rider extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            if(isLocationServiceOn){
+            if(isLocationShared(this)){
                 Log.d(Tag, "The button to stop has been pressed");
                 stopService(new Intent(this, BackgroundLocationService.class));
                 item.setTitle("Enable Location Share");
-                isLocationServiceOn = false;
+                Utils.setLocationShareStatus(this, false);
             }else {
                 startService(new Intent(this, BackgroundLocationService.class));
                 item.setTitle("Disable Location Share");
-                isLocationServiceOn = true;
+                Utils.setLocationShareStatus(this, true);
             }
         }
 
@@ -358,6 +379,7 @@ public class Rider extends AppCompatActivity
             editor.putBoolean(Constants.USER_STATUS, false);
             editor.commit();
             Intent intent = new Intent(this, LoginActivity.class);
+            Utils.setLocationShareStatus(this, true);
             startActivity(intent);
         }
 

@@ -234,6 +234,29 @@ public class Utils {
         editor.commit();
     }
 
+    public static boolean isLocationShared(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getBoolean(Constants.LOCATION_SHARE_STATUS,false);
+    }
+
+    public static void setLocationShareStatus(Context context,Boolean status){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(Constants.LOCATION_SHARE_STATUS,status);
+        editor.commit();
+    }
+
+    public static boolean isLocationStatusNotSet(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getBoolean(Constants.LOCATION_SHARE_STATUS_FLAG,true);
+    }
+
+    public static void setLocationStatuFlag(Context context, Boolean flag){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(Constants.LOCATION_SHARE_STATUS_FLAG,flag);
+        editor.commit();
+    }
    //get Client Key
     public  static String getClientKey(Context context){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);

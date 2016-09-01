@@ -62,7 +62,7 @@ public class GoogleMapFragment extends Fragment implements
     private LocationRequest mLocationRequest;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
-    boolean isLocationServiceOn = true;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -94,7 +94,7 @@ public class GoogleMapFragment extends Fragment implements
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         MenuItem bedMenuItem = menu.findItem(R.id.action_settings);
-        if(isLocationServiceOn){
+        if(Utils.isLocationShared(getContext())){
             bedMenuItem.setTitle("Disable Location Share");
         }else{
             bedMenuItem.setTitle("Enable Location Share");
@@ -115,20 +115,21 @@ public class GoogleMapFragment extends Fragment implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            if(isLocationServiceOn) {
+            if(Utils.isLocationShared(getContext())) {
                 Log.d("Tag", "The button to stop has been pressed");
                 if (this.mGoogleApiClient != null) {
                     Intent intent = new Intent(getContext(), CurrentLocationReceiver.class);
                     PendingIntent locationIntent = PendingIntent.getBroadcast(getContext(), 14872, intent, PendingIntent.FLAG_CANCEL_CURRENT);
                     LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, locationIntent);
                     item.setTitle("Enable Location Share");
-                    isLocationServiceOn = false;
+                    Utils.setLocationShareStatus(getContext(),false);
+
                 }
             }else {
                 if (this.mGoogleApiClient != null&& mGoogleApiClient.isConnected()) {
                     requestLocationUpdates();
                     item.setTitle("Disable Location Share");
-                    isLocationServiceOn = true;
+                    Utils.setLocationShareStatus(getContext(),true);
                 }
 
             }
@@ -142,6 +143,7 @@ public class GoogleMapFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View rootView = inflater.inflate(R.layout.fragment_google_map, container, false);
         mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mSupportMapFragment == null) {
@@ -222,7 +224,9 @@ public class GoogleMapFragment extends Fragment implements
     @Override
     public void onConnected(Bundle bundle) {
         // Request location updates using static settings
-        requestLocationUpdates();
+        if (Utils.isLocationShared(getContext())) {
+            requestLocationUpdates();
+        }
     }
 
     private void requestLocationUpdates() {

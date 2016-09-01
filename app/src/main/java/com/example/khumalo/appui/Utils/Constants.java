@@ -34,7 +34,8 @@ public final class Constants {
     public static final double TOLERANCE_IN_METERS = 300;
 
     public static final String USER_STATUS = "userStatus";
-
+    public static final String LOCATION_SHARE_STATUS = "locationShareStatus";
+    public static final String LOCATION_SHARE_STATUS_FLAG = "locationStatusFlag" ;
 
     //Location Services constants
     // Milliseconds per second
@@ -51,7 +52,6 @@ public final class Constants {
     public static final String LOCATION_FILE = "sdcard/location.txt";
     // Stores the connect / disconnect data in a text file
     public static final String LOG_FILE = "sdcard/log.txt";
-
 
 
 

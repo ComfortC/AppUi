@@ -26,6 +26,7 @@ import com.example.khumalo.appui.ClientFragments.DriverProfile;
 import com.example.khumalo.appui.ClientFragments.GoogleMapFragment;
 import com.example.khumalo.appui.Login.LoginActivity;
 import com.example.khumalo.appui.Utils.Constants;
+import com.example.khumalo.appui.Utils.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity
@@ -35,6 +36,11 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Utils.isLocationStatusNotSet(this)) {
+            Utils.setLocationShareStatus(this, true);
+            Utils.setLocationStatuFlag(this,false);
+        }
         initializeScreen();
     }
 
@@ -104,7 +110,9 @@ public class MainActivity extends AppCompatActivity
             editor.putBoolean(Constants.USER_STATUS, false);
             editor.commit();
             Intent intent = new Intent(this, LoginActivity.class);
+            Utils.setLocationShareStatus(this, true);
             startActivity(intent);
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
