@@ -7,8 +7,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -30,18 +33,29 @@ import com.example.khumalo.appui.R;
 import com.example.khumalo.appui.Utils.Constants;
 import com.example.khumalo.appui.Utils.PermissionUtils;
 import com.example.khumalo.appui.Utils.Utils;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,6 +77,7 @@ public class GoogleMapFragment extends Fragment implements
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
 
+    private DriverRoute myDriver;
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -145,6 +160,21 @@ public class GoogleMapFragment extends Fragment implements
         // Inflate the layout for this fragment
 
         View rootView = inflater.inflate(R.layout.fragment_google_map, container, false);
+        FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("Tag","Fab clicked");
+                if(myDriver!=null){
+                    List<LatLng> polyLocations= myDriver.getWayLatLongPolyline();
+                    int lastPostion = polyLocations.size()-1;
+                    addMarkerToDestination(m_map,polyLocations,lastPostion);
+                    addMarkerToDestination(m_map,polyLocations,0);
+                    drawPolylineCurrentPlaceToDestanation(m_map, polyLocations);
+                    moveCameraToPosition(m_map,polyLocations,lastPostion);
+                }
+            }
+        });
         mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mSupportMapFragment == null) {
             FragmentManager fragmentManager = getFragmentManager();
@@ -169,6 +199,8 @@ public class GoogleMapFragment extends Fragment implements
             addClient();
           }
 
+       searchForMyRide();
+
         mLocationRequest = LocationRequest.create();
         // Use high accuracy
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -177,9 +209,34 @@ public class GoogleMapFragment extends Fragment implements
         // Set the fastest update interval to 1 second
         mLocationRequest.setFastestInterval(3000);
         buildGoogleApiClient();
+
         return rootView;
     }
 
+    //The real work being done here
+   private void searchForMyRide(){
+        Firebase firebase = new Firebase(Constants.FIREBASE_ROUTES_URL);
+        final List<DriverRoute> driverRoutes= new ArrayList<DriverRoute>();;
+        firebase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Log.d("Tag", "The database returned " + dataSnapshot.getValue().toString() + " of Type " + dataSnapshot.getClass().getName());
+                for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                    DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class),snapshot.getKey());
+                    driverRoutes.add(driverRoute);
+                }
+                myDriver = driverRoutes.get(0);
+                Log.d("Tag","Driver found");
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.d("Tag", "loadPost:onCancelled ", firebaseError.toException());
+            }
+        });
+
+    }
 
     private void addClient() {
         Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.CLIENTS_URL);
@@ -191,6 +248,33 @@ public class GoogleMapFragment extends Fragment implements
     }
 
 
+
+    private void addMarkerToDestination(GoogleMap mMap, List<LatLng> polyLocations, int finalPosition) {
+
+        MarkerOptions destination = new MarkerOptions().position(polyLocations.get(finalPosition))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+
+        mMap.addMarker(destination);
+    }
+
+    private void drawPolylineCurrentPlaceToDestanation(GoogleMap mMap, List<LatLng> polyLocations) {
+        PolylineOptions polylineOptions = new PolylineOptions().
+                geodesic(true).
+                color(Color.BLUE).
+                width(10);
+
+        polylineOptions.addAll(polyLocations);
+        mMap.addPolyline(polylineOptions);
+    }
+
+
+    private void moveCameraToPosition(GoogleMap mMap, final List<LatLng> polyLocations, int finalPosition) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(polyLocations.get(0)).include(polyLocations.get(finalPosition));
+        LatLngBounds bounds = builder.build();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150), 4000, null);
+
+    }
     /*
 * Create a new location client, using the enclosing class to
 * handle callbacks.

@@ -10,10 +10,15 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.example.khumalo.appui.BackgroundServices.BackgroundLocationService;
+import com.example.khumalo.appui.DriverModel.DriverRoute;
 import com.example.khumalo.appui.Model.Distance;
 import com.example.khumalo.appui.Model.Duration;
 import com.example.khumalo.appui.Model.Leg;
 import com.example.khumalo.appui.Model.Step;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -299,4 +304,6 @@ public class Utils {
 
 
 
-}
+
+
+   }
