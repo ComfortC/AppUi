@@ -84,6 +84,9 @@ public class GoogleMapFragment extends Fragment implements
     private boolean mPermissionDenied = false;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3;
     private static final int PLACE_PICKER_REQUEST = 44;
+    private ProgressDialog progressDialog;
+    static LatLng currentPosition;
+    private boolean isDriverNotFound;
 
     private DriverRoute myDriver;
     /**
@@ -173,6 +176,7 @@ public class GoogleMapFragment extends Fragment implements
             @Override
             public void onClick(View view) {
                 Log.d("Tag","Fab clicked");
+                m_map.clear();
                 buildPlacePickerAutoCompleteDialog();
                 /*if(myDriver!=null){
                     List<LatLng> polyLocations= myDriver.getWayLatLongPolyline();
@@ -208,8 +212,6 @@ public class GoogleMapFragment extends Fragment implements
             addClient();
           }
 
-        searchForMyRide();
-
         mLocationRequest = LocationRequest.create();
         // Use high accuracy
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -223,20 +225,40 @@ public class GoogleMapFragment extends Fragment implements
     }
 
     //The real work being done here
-   private void searchForMyRide(){
+   private void searchForMyRide(final LatLng destination){
         Firebase firebase = new Firebase(Constants.FIREBASE_ROUTES_URL);
         final List<DriverRoute> driverRoutes= new ArrayList<DriverRoute>();;
-        firebase.addValueEventListener(new ValueEventListener() {
+        firebase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
+                isDriverNotFound = true;
                 Log.d("Tag", "The database returned " + dataSnapshot.getValue().toString() + " of Type " + dataSnapshot.getClass().getName());
-                for(DataSnapshot snapshot: dataSnapshot.getChildren()){
-                    DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class),snapshot.getKey());
-                    driverRoutes.add(driverRoute);
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class), snapshot.getKey());
+                    if(currentPosition!=null){
+                        if(driverRoute.isMatch(currentPosition,destination)){
+                            progressDialog.dismiss();
+                            myDriver = driverRoute;
+                            isDriverNotFound = false;
+                            Toast.makeText(getActivity(),"Your ride almost here",Toast.LENGTH_LONG).show();
+                            updateMap();
+                            Log.d("Tag", "Driver found");
+                            break;
+                        }else {
+                            Log.d("Tag","This driver does not match");
+                        }
+                    }else {
+                        Log.d("Tag","Current Positions is null");
+                        Toast.makeText(getActivity(),"CurrentPosition is null",Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
+                        break;
+                    }
                 }
-                myDriver = driverRoutes.get(0);
-                Log.d("Tag","Driver found");
+                if(isDriverNotFound){
+                    Toast.makeText(getActivity(),"No Ride yet",Toast.LENGTH_LONG).show();
+                    progressDialog.dismiss();
+                }
+
             }
 
             @Override
@@ -247,6 +269,8 @@ public class GoogleMapFragment extends Fragment implements
 
     }
 
+
+
     private void addClient() {
         Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.CLIENTS_URL);
         Firebase keyRef = database.push();
@@ -256,6 +280,15 @@ public class GoogleMapFragment extends Fragment implements
         keyRef.setValue(clientProfile);
     }
 
+
+    private void updateMap() {
+        List<LatLng> polyLocations= myDriver.getWayLatLongPolyline();
+        int lastPostion = polyLocations.size()-1;
+        addMarkerToDestination(m_map,polyLocations,lastPostion);
+        addMarkerToDestination(m_map,polyLocations,0);
+        drawPolylineCurrentPlaceToDestanation(m_map, polyLocations);
+        moveCameraToPosition(m_map,polyLocations,lastPostion);
+    }
 
 
     private void addMarkerToDestination(GoogleMap mMap, List<LatLng> polyLocations, int finalPosition) {
@@ -405,7 +438,7 @@ public class GoogleMapFragment extends Fragment implements
             if(result!=null){
                 double latitude = result.getLastLocation().getLatitude();
                 double longitude = result.getLastLocation().getLongitude();
-                LatLng currentPosition = new LatLng(latitude,longitude);
+                currentPosition = new LatLng(latitude,longitude);
                 Toast.makeText(context, currentPosition.toString(), Toast.LENGTH_SHORT).show();
                 DriverLocation clientLocation = new DriverLocation(latitude,longitude);
                 addLocation(clientLocation,context);
@@ -455,6 +488,10 @@ public class GoogleMapFragment extends Fragment implements
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == getActivity().RESULT_OK ) {
                 Place place = PlaceAutocomplete.getPlace(getActivity(), data);
+                progressDialog = ProgressDialog.show(getActivity(), "Please wait.",
+                        "Searching for your ride...!", true);
+                LatLng destination = place.getLatLng();
+                searchForMyRide(destination);
                 Log.d("Tag", place.getAddress().toString());
 
             }
