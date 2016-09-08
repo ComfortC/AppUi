@@ -28,12 +28,15 @@ import com.example.khumalo.appui.ClientFragments.GoogleMapFragment;
 import com.example.khumalo.appui.Login.LoginActivity;
 import com.example.khumalo.appui.Utils.Constants;
 import com.example.khumalo.appui.Utils.Utils;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    private CollapsingToolbarLayout collapsingToolbarLayout;
+    GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +48,14 @@ public class MainActivity extends AppCompatActivity
             Utils.setLocationStatuFlag(this,false);
         }
         initializeScreen();
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     private void initializeScreen() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle("Comfort");
 
        /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -71,19 +74,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-
-        /**
-         * Create SectionPagerAdapter, set it as adapter to viewPager with setOffscreenPageLimit(2)
-         **/
-        SectionPagerAdapter adapter = new SectionPagerAdapter(getSupportFragmentManager());
-        viewPager.setOffscreenPageLimit(2);
-        viewPager.setAdapter(adapter);
-        /**
-         * Setup the mTabLayout with view pager
-         */
-        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -126,66 +116,13 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
-    /**
-     * SectionPagerAdapter class that extends FragmentStatePagerAdapter to save fragments state
-     */
-    public class SectionPagerAdapter extends FragmentStatePagerAdapter {
-
-        public SectionPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        /**
-         * Use positions (0 and 1) to find and instantiate fragments with newInstance()
-         *
-         * @param position
-         */
-        @Override
-        public Fragment getItem(int position) {
-
-            Fragment fragment = null;
-
-            /**
-             * Set fragment to different fragments depending on position in ViewPager
-             */
-            switch (position) {
-                case 0:
-                    fragment = GoogleMapFragment.newInstance();
-                    break;
-                case 1:
-                    fragment = DriverProfile.newInstance();
-                    break;
-                default:
-                    fragment = GoogleMapFragment.newInstance();
-                    break;
-            }
-
-            return fragment;
-        }
-
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        /**
-         * Set string resources as titles for each fragment by it's position
-         *
-         * @param position
-         */
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return getString(R.string.pager_map);
-                case 1:
-                default:
-                    return getString(R.string.pager_driver_profile);
-            }
-        }
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
     }
+
+
+
 
 
 }
