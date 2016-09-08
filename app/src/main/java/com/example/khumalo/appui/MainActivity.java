@@ -96,8 +96,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_credit) {
             // Handle the camera action
-            Intent intent = new Intent(this,DriverValidation.class);
-            startActivity(intent);
+
 
         } else if (id == R.id.nav_signOut) {
             FirebaseAuth.getInstance().signOut();
@@ -110,6 +109,9 @@ public class MainActivity extends AppCompatActivity
             Utils.setLocationShareStatus(this, true);
             startActivity(intent);
 
+        } else if (id == R.id.nav_driver_profile){
+            Intent intent = new Intent(this,DriverValidation.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
