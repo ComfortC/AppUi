@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/nav_camara" android:icon="@drawable/ic_euro_symbol"
+        <item android:id="@+id/nav_credit" android:icon="@drawable/ic_euro_symbol"
             android:title="Credit" />
 
     </group>

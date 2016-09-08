@@ -23,7 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.khumalo.appui.ClientFragments.DriverProfile;
+
 import com.example.khumalo.appui.ClientFragments.GoogleMapFragment;
 import com.example.khumalo.appui.Login.LoginActivity;
 import com.example.khumalo.appui.Utils.Constants;
@@ -94,9 +94,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
+        if (id == R.id.nav_credit) {
             // Handle the camera action
-
+            Intent intent = new Intent(this,DriverValidation.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_signOut) {
             FirebaseAuth.getInstance().signOut();
