@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 
 import com.bumptech.glide.Glide;
 
@@ -36,6 +37,8 @@ public class DriverValidation extends AppCompatActivity {
         collapsingToolbar.setTitle("Comfort");
 
         loadBackdrop();
+        RatingBar ratingBar = (RatingBar)findViewById(R.id.driver_ratings);
+        ratingBar.setRating(4);
     }
 
     private void loadBackdrop() {
