@@ -34,6 +34,7 @@ public class DriverValidation extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("Comfort");
+
         loadBackdrop();
     }
 
