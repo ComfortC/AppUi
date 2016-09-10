@@ -55,6 +55,9 @@ public final class Constants {
     public static final String LOG_FILE = "sdcard/log.txt";
 
 
+   // Notification Center
+    public static final String FIREBASE_NOTIFICATION_TEST_MESSAGE = FIREBASE_URL+"Notification";
+    public static final int AVAILABLE_DRIVER_NOTIFICATION = 133;
 
     /**
      * Suppress default constructor for noninstantiability

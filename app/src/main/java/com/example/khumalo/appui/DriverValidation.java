@@ -1,5 +1,6 @@
 package com.example.khumalo.appui;
 
+import android.app.NotificationManager;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 
 import com.bumptech.glide.Glide;
+import com.example.khumalo.appui.Utils.Constants;
 
 public class DriverValidation extends AppCompatActivity {
 
@@ -22,6 +24,9 @@ public class DriverValidation extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        NotificationManager nMgr = (NotificationManager) getSystemService(getBaseContext().NOTIFICATION_SERVICE);
+        nMgr.cancel(Constants.AVAILABLE_DRIVER_NOTIFICATION);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
