@@ -64,6 +64,8 @@
             android:name=".DriverValidation"
             android:label="@string/title_activity_driver_validation"
             android:theme="@style/AppTheme"
+            android:parentActivityName=".MainActivity"
+
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

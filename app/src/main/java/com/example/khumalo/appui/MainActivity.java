@@ -54,9 +54,6 @@ public class MainActivity extends AppCompatActivity
         }
         initializeScreen();
 
-        Firebase firebase = new Firebase(Constants.FIREBASE_NOTIFICATION_TEST_MESSAGE);
-        firebase.setValue("This is a Test Message");
-
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);

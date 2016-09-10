@@ -36,6 +36,8 @@ import android.view.Display;
 import android.widget.MultiAutoCompleteTextView;
 
 import com.example.khumalo.appui.DriverValidation;
+import com.example.khumalo.appui.MainActivity;
+import com.example.khumalo.appui.MainEntry;
 import com.example.khumalo.appui.R;
 import com.example.khumalo.appui.Utils.Constants;
 
@@ -63,12 +65,11 @@ public class BuildNotification  {
 
         Intent intent = new Intent(context, DriverValidation.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+
         stackBuilder.addParentStack(DriverValidation.class);
         stackBuilder.addNextIntent(intent);
 
-        PendingIntent result = PendingIntent.getActivity(
-                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
-        );
+        PendingIntent result = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
 
         builder.setContentIntent(result);
         NotificationManager manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
