@@ -24,6 +24,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -92,11 +93,16 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        buildGoogleApiClient();
         if (Utils.isLocationStatusNotSet(this)) {
             Utils.setLocationShareStatus(this, true);
-            Utils.setLocationStatuFlag(this,false);
+            Utils.setLocationStatuFlag(this, false);
         }
+        buildGoogleApiClient();
+        if(Utils.getClientKey(this)==null){
+            addClient();
+        }
+
+
         initializeScreen();
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
@@ -200,6 +206,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(Bundle bundle) {
 
+        if (Utils.isLocationShared(this)) {
+            requestLocationUpdates();
+        }
     }
 
     @Override
@@ -278,11 +287,14 @@ public class MainActivity extends AppCompatActivity
                 requestLocationUpdates();
             } else if(requestCode==Constants.MY_LOCATION_REQUEST_CODE) {
                 makeMyLocationEnabled(mMap);
+                if (Utils.isLocationShared(this)) {
+                    requestLocationUpdates();
+                }
             }else if(requestCode==PLACE_AUTOCOMPLETE_REQUEST_CODE){
                 buildPlacePickerAutoCompleteDialog();
+            }else {
+                mPermissionDenied = true;
             }
-        } else {
-            mPermissionDenied = true;
         }
     }
 
@@ -441,7 +453,7 @@ public class MainActivity extends AppCompatActivity
         addMarkerToDestination(mMap,polyLocations,lastPostion);
         addMarkerToDestination(mMap,polyLocations,0);
         drawPolylineCurrentPlaceToDestanation(mMap, polyLocations);
-        moveCameraToPosition(mMap,polyLocations,lastPostion);
+        moveCameraToPosition(mMap, polyLocations, lastPostion);
     }
 
 
@@ -472,5 +484,60 @@ public class MainActivity extends AppCompatActivity
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150), 4000, null);
 
     }
+
+
+    //Options Menu
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem bedMenuItem = menu.findItem(R.id.action_settings);
+        if(Utils.isLocationShared(this)){
+            bedMenuItem.setTitle("Disable Location Share");
+            return true;
+        }else{
+            bedMenuItem.setTitle("Enable Location Share");
+            return true;
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.map_fragment, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            if(Utils.isLocationShared(this)) {
+                Log.d("Tag", "The button to stop has been pressed");
+                if (this.mGoogleApiClient != null) {
+                    Intent intent = new Intent(this, CurrentLocationReceiver.class);
+                    PendingIntent locationIntent = PendingIntent.getBroadcast(this, 14872, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, locationIntent);
+                    item.setTitle("Enable Location Share");
+                    Utils.setLocationShareStatus(this,false);
+
+                }
+            }else {
+                if (this.mGoogleApiClient != null&& mGoogleApiClient.isConnected()) {
+                    requestLocationUpdates();
+                    item.setTitle("Disable Location Share");
+                    Utils.setLocationShareStatus(this,true);
+                }
+
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
 }

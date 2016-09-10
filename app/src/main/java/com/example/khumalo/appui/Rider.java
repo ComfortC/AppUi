@@ -198,7 +198,7 @@ public class Rider extends AppCompatActivity
         if (Utils.isLocationShared(this)) {
             requestLastKnownLocation();
 
-        }
+    }
 
     }
 
@@ -247,10 +247,10 @@ public class Rider extends AppCompatActivity
 
             }else if(requestCode== Constants.MY_LOCATION_REQUEST_CODE){
                     makeMyLocationEnabled(mMap);
+            } else {
+                mPermissionDenied =true;
             }
 
-        } else {
-            mPermissionDenied =true;
         }
     }
 

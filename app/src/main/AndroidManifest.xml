@@ -50,7 +50,7 @@
             android:name=".Rider$LocationReceiver"
             android:enabled="true" />
         <receiver
-            android:name=".ClientFragments.GoogleMapFragment$CurrentLocationReceiver"
+            android:name=".MainActivity$CurrentLocationReceiver"
             android:enabled="true" />
 
         <meta-data
