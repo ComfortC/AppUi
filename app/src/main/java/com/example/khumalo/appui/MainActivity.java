@@ -93,8 +93,8 @@ public class MainActivity extends AppCompatActivity
     private boolean isDriverNotFound;
     private DriverRoute myDriver;
 
-    private AlarmManager alarmMgr;
-    private PendingIntent alarmIntent;
+    private ValueEventListener mActiveListRefListener;
+    Firebase firebaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity
             if (resultCode == RESULT_OK ) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 LatLng destination = place.getLatLng();
-                Utils.setClientDestination(this,destination);
+                Utils.setClientDestination(this, destination);
 
 
 
@@ -397,9 +397,9 @@ public class MainActivity extends AppCompatActivity
 
     //The real work being done here
     private void searchForMyRide(final LatLng destination){
-        Firebase firebase = new Firebase(Constants.FIREBASE_ROUTES_URL);
+        firebaseRef = new Firebase(Constants.FIREBASE_ROUTES_URL);
         final List<DriverRoute> driverRoutes= new ArrayList<DriverRoute>();;
-        firebase.addListenerForSingleValueEvent(new ValueEventListener() {
+        firebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 isDriverNotFound = true;
@@ -424,10 +424,7 @@ public class MainActivity extends AppCompatActivity
                         break;
                     }
                 }
-                if (isDriverNotFound) {
-                    Toast.makeText(getBaseContext(), "No Ride yet", Toast.LENGTH_LONG).show();
 
-                }
 
             }
 
@@ -436,6 +433,43 @@ public class MainActivity extends AppCompatActivity
                 Log.d("Tag", "loadPost:onCancelled ", firebaseError.toException());
             }
         });
+
+        if (isDriverNotFound) {
+            Toast.makeText(getBaseContext(), "You'l be notified of ride soon!", Toast.LENGTH_LONG).show();
+             mActiveListRefListener =  firebaseRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    isDriverNotFound = true;
+                    Log.d("Tag", "The database returned " + dataSnapshot.getValue().toString() + " of Type " + dataSnapshot.getClass().getName());
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class), snapshot.getKey());
+                        if (currentPosition != null) {
+                            if (driverRoute.isMatch(currentPosition, Utils.getClientDestination(getBaseContext()))) {
+                                myDriver = driverRoute;
+                                firebaseRef.removeEventListener(mActiveListRefListener);
+                                isDriverNotFound = false;
+                                Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
+                                updateMap();
+                                break;
+                            } else {
+                                Log.d("Tag", "This driver does not match");
+                            }
+                        } else {
+                            Log.d("Tag", "Current Positions is null");
+                            Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
+                            break;
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+
+                }
+            });
+
+        }
+
 
     }
 
