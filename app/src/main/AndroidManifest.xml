@@ -24,12 +24,12 @@
         </activity>
         <activity
             android:name=".Rider"
-            android:label="@string/title_activity_rider"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
             android:name=".MainEntry"
-            android:label="@string/title_activity_main_entry"
+            android:label="@string/app_name"
             android:noHistory="true"
             android:theme="@style/AppTheme" >
             <intent-filter>
@@ -52,6 +52,10 @@
         <receiver
             android:name=".MainActivity$CurrentLocationReceiver"
             android:enabled="true" />
+
+
+
+
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

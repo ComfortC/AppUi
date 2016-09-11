@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Random;
 
@@ -274,6 +275,27 @@ public class Utils {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString(Constants.CLIENT_KEY,null);
     }
+
+    public static void setClientDestination(Context context, LatLng destination){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putLong(Constants.CLIENT_DESTINATION_LATITUDE, Double.doubleToRawLongBits(destination.latitude));
+        editor.putLong(Constants.CLIENT_DESTINATION_LONGITUDE, Double.doubleToRawLongBits(destination.longitude));
+        editor.commit();
+    }
+
+
+    public static LatLng getClientDestination(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        double lat = Double.longBitsToDouble(sp.getLong(Constants.CLIENT_DESTINATION_LATITUDE, 0));
+        double lon = Double.longBitsToDouble(sp.getLong(Constants.CLIENT_DESTINATION_LONGITUDE,0));
+        return new LatLng(lat,lon);
+    }
+
+
+
+
+
 
     //Determining if they can share
     //Testing if the two points are found on the path

@@ -59,6 +59,13 @@ public final class Constants {
     public static final String FIREBASE_NOTIFICATION_TEST_MESSAGE = FIREBASE_URL+"Notification";
     public static final int AVAILABLE_DRIVER_NOTIFICATION = 133;
 
+
+    public static final String CLIENT_DESTINATION_LATITUDE = "Client_Destination_latitude";
+    public static final String CLIENT_DESTINATION_LONGITUDE = "Client_Destination_longitude";
+
+    public static final String DRIVER_DESTINATION_LATITUDE = "Driver_Destination_latitude";
+    public static final String DRIVER_DESTINATION_LANGITUDE = "Driver_Destination_longitude";
+
     /**
      * Suppress default constructor for noninstantiability
      */

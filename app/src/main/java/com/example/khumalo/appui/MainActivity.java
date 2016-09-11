@@ -1,6 +1,7 @@
 package com.example.khumalo.appui;
 
 import android.*;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -9,7 +10,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+ import java.util.Calendar;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -71,6 +74,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -88,6 +92,9 @@ public class MainActivity extends AppCompatActivity
     static LatLng currentPosition;
     private boolean isDriverNotFound;
     private DriverRoute myDriver;
+
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,8 +139,7 @@ public class MainActivity extends AppCompatActivity
 
                     }
                 });*/
-                Snackbar.make(view, "A message has been added", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
             }
         });
 
@@ -350,10 +356,12 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK ) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
-             /*   progressDialog = ProgressDialog.show(this, "Please wait.",
-                        "Searching for your ride...!", true);*/
                 LatLng destination = place.getLatLng();
-               // searchForMyRide(destination);
+                Utils.setClientDestination(this,destination);
+
+
+
+                searchForMyRide(destination);
 
                 Log.d("Tag", place.getAddress().toString());
 
@@ -400,7 +408,7 @@ public class MainActivity extends AppCompatActivity
                     DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class), snapshot.getKey());
                     if (currentPosition != null) {
                         if (driverRoute.isMatch(currentPosition, destination)) {
-                            progressDialog.dismiss();
+
                             myDriver = driverRoute;
                             isDriverNotFound = false;
                             Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
@@ -413,13 +421,12 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         Log.d("Tag", "Current Positions is null");
                         Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
-                        progressDialog.dismiss();
                         break;
                     }
                 }
                 if (isDriverNotFound) {
                     Toast.makeText(getBaseContext(), "No Ride yet", Toast.LENGTH_LONG).show();
-                    progressDialog.dismiss();
+
                 }
 
             }
@@ -431,6 +438,9 @@ public class MainActivity extends AppCompatActivity
         });
 
     }
+
+
+
 
 
 
