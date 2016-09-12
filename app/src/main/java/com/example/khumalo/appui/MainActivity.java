@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity
 
     private ValueEventListener mActiveListRefListener;
     Firebase firebaseRef;
+    List<DriverRoute> driverRoutes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity
             Utils.setLocationStatuFlag(this, false);
         }
         buildGoogleApiClient();
+        driverRoutes = loadRoutes();
         if(Utils.getClientKey(this)==null){
             addClient();
         }
@@ -125,7 +127,11 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                buildPlacePickerAutoCompleteDialog();
+                 if(driverRoutes!=null){
+                     String size = String.valueOf(driverRoutes.size());
+                     Toast.makeText(getBaseContext(),size,Toast.LENGTH_LONG).show();
+                 }
+                //buildPlacePickerAutoCompleteDialog();
 
            /*     Firebase firebase = new Firebase(Constants.FIREBASE_NOTIFICATION_TEST_MESSAGE);
                 firebase.addValueEventListener(new ValueEventListener() {
@@ -168,6 +174,37 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+
+
+    private List<DriverRoute> loadRoutes(){
+        final List<DriverRoute> routes = new ArrayList<DriverRoute>();
+        firebaseRef = new Firebase(Constants.FIREBASE_ROUTES_URL);
+        firebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+           @Override
+           public void onDataChange(DataSnapshot dataSnapshot) {
+               isDriverNotFound = true;
+               Log.d("Tag", "The database returned " + dataSnapshot.getValue().toString() + " of Type " + dataSnapshot.getClass().getName());
+               for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                   DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class), snapshot.getKey());
+                   routes.add(driverRoute);
+               }
+           }
+
+
+           @Override
+           public void onCancelled(FirebaseError firebaseError) {
+               Log.d("Tag", "loadPost:onCancelled ", firebaseError.toException());
+           }
+       });
+        return routes;
+    }
+
+
+
+
+
+
+
 
 
 
@@ -398,7 +435,7 @@ public class MainActivity extends AppCompatActivity
     //The real work being done here
     private void searchForMyRide(final LatLng destination){
         firebaseRef = new Firebase(Constants.FIREBASE_ROUTES_URL);
-        final List<DriverRoute> driverRoutes= new ArrayList<DriverRoute>();;
+        final List<DriverRoute> driverRoutes= new ArrayList<DriverRoute>();
         firebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
