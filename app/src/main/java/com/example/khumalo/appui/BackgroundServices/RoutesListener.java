@@ -31,7 +31,7 @@ public class RoutesListener extends Service {
     public void onCreate() {
         super.onCreate();
         firebaseRef = new Firebase(Constants.FIREBASE_ROUTES_URL);
-
+        Log.d("Tag", "RoutesListener Service has been created");
     }
 
     @Override

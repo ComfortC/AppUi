@@ -40,6 +40,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 
+import com.example.khumalo.appui.BackgroundServices.RoutesListener;
 import com.example.khumalo.appui.ClientFragments.GoogleMapFragment;
 import com.example.khumalo.appui.ClientModel.ClientProfile;
 import com.example.khumalo.appui.DriverModel.DriverLocation;
@@ -127,10 +128,10 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 if(driverRoutes!=null){
+               /*  if(driverRoutes!=null){
                      String size = String.valueOf(driverRoutes.size());
                      Toast.makeText(getBaseContext(),size,Toast.LENGTH_LONG).show();
-                 }
+                 }*/
                 buildPlacePickerAutoCompleteDialog();
 
            /*     Firebase firebase = new Firebase(Constants.FIREBASE_NOTIFICATION_TEST_MESSAGE);
@@ -202,7 +203,7 @@ public class MainActivity extends AppCompatActivity
 
     private boolean isDriverFound(){
           for(DriverRoute driverRoute: driverRoutes){
-              if (currentPosition != null) {
+
                   if (driverRoute.isMatch(currentPosition, Utils.getClientDestination(this))) {
 
                       myDriver = driverRoute;
@@ -214,11 +215,7 @@ public class MainActivity extends AppCompatActivity
                   } else {
                       Log.d("Tag", "This driver does not match");
                   }
-              } else {
-                  Log.d("Tag", "Current Positions is null");
-                  Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
-                  return false;
-              }
+
           }
         return false;
      }
@@ -429,15 +426,22 @@ public class MainActivity extends AppCompatActivity
 
 
     private void findMeADriver() {
-        if(driverRoutes!=null){
-            if(isDriverFound()){
-             updateMap();
-            }else{
-                Toast.makeText(this, "driver was not found", Toast.LENGTH_LONG).show();
+        if (currentPosition != null) {
+            if (driverRoutes != null) {
+                if (isDriverFound()) {
+                    updateMap();
+                } else {
+                    Toast.makeText(this, "driver was not found", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(this, RoutesListener.class);
+                    startService(intent);
+                }
+            } else {
+                Toast.makeText(this, "driverRoutes is null", Toast.LENGTH_LONG).show();
             }
         }else {
-            Toast.makeText(this,"driverRoutes is null",Toast.LENGTH_LONG).show();
-        }
+            Log.d("Tag", "Current Positions is null");
+            Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
+             }
     }
 
 
