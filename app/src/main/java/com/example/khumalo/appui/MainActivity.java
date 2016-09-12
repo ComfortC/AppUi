@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity
                      String size = String.valueOf(driverRoutes.size());
                      Toast.makeText(getBaseContext(),size,Toast.LENGTH_LONG).show();
                  }
-                //buildPlacePickerAutoCompleteDialog();
+                buildPlacePickerAutoCompleteDialog();
 
            /*     Firebase firebase = new Firebase(Constants.FIREBASE_NOTIFICATION_TEST_MESSAGE);
                 firebase.addValueEventListener(new ValueEventListener() {
@@ -200,7 +200,28 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    private boolean isDriverFound(){
+          for(DriverRoute driverRoute: driverRoutes){
+              if (currentPosition != null) {
+                  if (driverRoute.isMatch(currentPosition, Utils.getClientDestination(this))) {
 
+                      myDriver = driverRoute;
+                      isDriverNotFound = false;
+                      Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
+                      updateMap();
+                      Log.d("Tag", "Driver found");
+                      return true;
+                  } else {
+                      Log.d("Tag", "This driver does not match");
+                  }
+              } else {
+                  Log.d("Tag", "Current Positions is null");
+                  Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
+                  return false;
+              }
+          }
+        return false;
+     }
 
 
 
@@ -395,16 +416,32 @@ public class MainActivity extends AppCompatActivity
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 LatLng destination = place.getLatLng();
                 Utils.setClientDestination(this, destination);
+                findMeADriver();
 
 
-
-                searchForMyRide(destination);
+                //searchForMyRide(destination);
 
                 Log.d("Tag", place.getAddress().toString());
 
             }
         }
     }
+
+
+    private void findMeADriver() {
+        if(driverRoutes!=null){
+            if(isDriverFound()){
+             updateMap();
+            }else{
+                Toast.makeText(this, "driver was not found", Toast.LENGTH_LONG).show();
+            }
+        }else {
+            Toast.makeText(this,"driverRoutes is null",Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+
 
 
     public static class CurrentLocationReceiver extends BroadcastReceiver {
