@@ -454,6 +454,7 @@ public class MainActivity extends AppCompatActivity
                 double latitude = result.getLastLocation().getLatitude();
                 double longitude = result.getLastLocation().getLongitude();
                 currentPosition = new LatLng(latitude,longitude);
+                Utils.setClientLocation(context,currentPosition);
                 Toast.makeText(context, currentPosition.toString(), Toast.LENGTH_SHORT).show();
                 DriverLocation clientLocation = new DriverLocation(latitude,longitude);
                 addLocation(clientLocation,context);

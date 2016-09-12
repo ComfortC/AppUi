@@ -63,6 +63,9 @@ public final class Constants {
     public static final String CLIENT_DESTINATION_LATITUDE = "Client_Destination_latitude";
     public static final String CLIENT_DESTINATION_LONGITUDE = "Client_Destination_longitude";
 
+    public static final String CLIENT_LOCATION_LATITUDE = "Client_Location_latitude";
+    public static final String CLIENT_LOCATION_LONGITUDE = "Client_Location_longitude";
+
     public static final String DRIVER_DESTINATION_LATITUDE = "Driver_Destination_latitude";
     public static final String DRIVER_DESTINATION_LANGITUDE = "Driver_Destination_longitude";
 

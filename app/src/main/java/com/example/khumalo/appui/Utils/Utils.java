@@ -289,6 +289,24 @@ public class Utils {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         double lat = Double.longBitsToDouble(sp.getLong(Constants.CLIENT_DESTINATION_LATITUDE, 0));
         double lon = Double.longBitsToDouble(sp.getLong(Constants.CLIENT_DESTINATION_LONGITUDE,0));
+        if(lat == 0 && lon == 0){return null;}
+        return new LatLng(lat,lon);
+    }
+
+
+    public static void setClientLocation(Context context, LatLng location){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putLong(Constants.CLIENT_LOCATION_LATITUDE, Double.doubleToRawLongBits(location.latitude));
+        editor.putLong(Constants.CLIENT_LOCATION_LONGITUDE, Double.doubleToRawLongBits(location.longitude));
+        editor.commit();
+    }
+
+    public static LatLng getClientLocation(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        double lat = Double.longBitsToDouble(sp.getLong(Constants.CLIENT_LOCATION_LATITUDE, 0));
+        double lon = Double.longBitsToDouble(sp.getLong(Constants.CLIENT_LOCATION_LONGITUDE,0));
+        if(lat == 0 && lon == 0){return null;}
         return new LatLng(lat,lon);
     }
 
