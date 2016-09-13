@@ -429,9 +429,10 @@ public class MainActivity extends AppCompatActivity
         if (currentPosition != null) {
             if (driverRoutes != null) {
                 if (isDriverFound()) {
-                    updateMap();
+                    Intent intent = new Intent(this,DriverValidation.class);
+                    startActivity(intent);
+                   // updateMap();
                 } else {
-                    Toast.makeText(this, "driver was not found", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(this, RoutesListener.class);
                     startService(intent);
                 }
@@ -548,7 +549,6 @@ public class MainActivity extends AppCompatActivity
             });
 
         }
-
 
     }
 

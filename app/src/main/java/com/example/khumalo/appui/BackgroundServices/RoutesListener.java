@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.khumalo.appui.DriverModel.DriverRoute;
+import com.example.khumalo.appui.NotificationCenter.BuildNotification;
 import com.example.khumalo.appui.Utils.Constants;
 import com.example.khumalo.appui.Utils.Utils;
 import com.firebase.client.DataSnapshot;
@@ -49,6 +50,7 @@ public class RoutesListener extends Service {
                             myDriver = driverRoute;
                             firebaseRef.removeEventListener(mActiveListRefListener);
                             Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
+                            BuildNotification.generateNotification(getBaseContext());
                             stopSelf();
                             break;
                         } else {
