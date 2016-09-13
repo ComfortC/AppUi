@@ -48,6 +48,8 @@ import com.example.khumalo.appui.ClientModel.ClientProfile;
 import com.example.khumalo.appui.DriverModel.DriverLocation;
 import com.example.khumalo.appui.DriverModel.DriverRoute;
 import com.example.khumalo.appui.Login.LoginActivity;
+import com.example.khumalo.appui.MarkerAnimator.LatLngInterpolator;
+import com.example.khumalo.appui.MarkerAnimator.MarkerAnimation;
 import com.example.khumalo.appui.NotificationCenter.BuildNotification;
 import com.example.khumalo.appui.Utils.Constants;
 import com.example.khumalo.appui.Utils.PermissionUtils;
@@ -502,9 +504,9 @@ public class MainActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
                 DriverLocation location = dataSnapshot.getValue(DriverLocation.class);
                 LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                driverLocation.setPosition(currentLocation);
                 Toast.makeText(getBaseContext(),"Driver changed location ",Toast.LENGTH_LONG).show();
                 driverLocation.setVisible(true);
+                MarkerAnimation.animateMarkerToHC(driverLocation,currentLocation,new LatLngInterpolator.Linear());
             }
 
             @Override
