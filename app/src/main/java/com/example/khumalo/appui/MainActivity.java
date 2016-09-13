@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
  import java.util.Calendar;
+
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -70,6 +72,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,6 +80,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import static com.example.khumalo.appui.Utils.Utils.getClientReceivedDriverKey;
+import static com.example.khumalo.appui.Utils.Utils.setClientReceivedDriverKey;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -97,6 +103,9 @@ public class MainActivity extends AppCompatActivity
     private ValueEventListener mActiveListRefListener;
     Firebase firebaseRef;
     List<DriverRoute> driverRoutes;
+    Marker driverLocation;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,11 +214,10 @@ public class MainActivity extends AppCompatActivity
           for(DriverRoute driverRoute: driverRoutes){
 
                   if (driverRoute.isMatch(currentPosition, Utils.getClientDestination(this))) {
-
-                      myDriver = driverRoute;
+                       myDriver = driverRoute;
+                      setClientReceivedDriverKey(this,myDriver.getKey());
                       isDriverNotFound = false;
                       Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
-                      updateMap();
                       Log.d("Tag", "Driver found");
                       return true;
                   } else {
@@ -261,6 +269,20 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         makeMyLocationEnabled(mMap);
+        Log.d("Tag","OnMapReady has been called");
+        MarkerOptions destination = new MarkerOptions().position(Utils.getClientLocation(this))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+
+        driverLocation=mMap.addMarker(destination);
+        driverLocation.setVisible(false);
+        String driverKey = getClientReceivedDriverKey(this);
+        if(driverKey!=null){
+            Log.d("Tag","The Driver Key is not null "+ driverKey);
+            ListenForTheDriverLocation(driverKey);
+        }
+
+
+
     }
 
 
@@ -368,7 +390,10 @@ public class MainActivity extends AppCompatActivity
             showMissingPermissionError();
             mPermissionDenied = false;
         }
+
     }
+
+
 
     private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
@@ -474,6 +499,25 @@ public class MainActivity extends AppCompatActivity
         database.setValue(driverLocation);
     }
 
+
+    private void ListenForTheDriverLocation(String DriverKey){
+        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(DriverKey);
+        database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                DriverLocation location = dataSnapshot.getValue(DriverLocation.class);
+                LatLng currentLocation = new LatLng(location.getLatitude(),location.getLongitude());
+                Log.d("Tag","Driver Location was returned "+currentLocation.toString());
+                driverLocation.setPosition(currentLocation);
+                driverLocation.setVisible(true);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+    }
 
     //The real work being done here
     private void searchForMyRide(final LatLng destination){

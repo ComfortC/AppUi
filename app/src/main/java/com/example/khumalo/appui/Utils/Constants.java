@@ -30,6 +30,7 @@ public final class Constants {
 
     public static final String DRIVER_KEY = PACKAGE_NAME+"KEY";
     public static final String CLIENT_KEY = PACKAGE_NAME+"CLIENTKEY";
+    public static final String CLIENT_RECEIVED_DRIVER_KEY = PACKAGE_NAME+"Client_Received_Driver_Key";
 
     public static final double TOLERANCE_IN_METERS = 300;
 

@@ -276,6 +276,20 @@ public class Utils {
         return sp.getString(Constants.CLIENT_KEY,null);
     }
 
+    public static void setClientReceivedDriverKey(Context context, String key){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.CLIENT_RECEIVED_DRIVER_KEY,key);
+        editor.commit();
+    }
+
+    public static String getClientReceivedDriverKey(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(Constants.CLIENT_RECEIVED_DRIVER_KEY,null);
+    }
+
+
+
     public static void setClientDestination(Context context, LatLng destination){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
