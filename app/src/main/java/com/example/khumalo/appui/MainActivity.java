@@ -277,7 +277,6 @@ public class MainActivity extends AppCompatActivity
         driverLocation.setVisible(false);
         String driverKey = getClientReceivedDriverKey(this);
         if(driverKey!=null){
-            Log.d("Tag","The Driver Key is not null "+ driverKey);
             ListenForTheDriverLocation(driverKey);
         }
 
@@ -411,8 +410,7 @@ public class MainActivity extends AppCompatActivity
                     android.Manifest.permission.ACCESS_FINE_LOCATION, true);
 
         } else {
-            Log.d("Tag", "The Location Access has been Granted");
-            try {
+             try {
                 Toast toast = Toast.makeText(this, "What's your destination?", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
@@ -443,9 +441,7 @@ public class MainActivity extends AppCompatActivity
 
                 //searchForMyRide(destination);
 
-                Log.d("Tag", place.getAddress().toString());
-
-            }
+                }
         }
     }
 
@@ -465,8 +461,7 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(this, "driverRoutes is null", Toast.LENGTH_LONG).show();
             }
         }else {
-            Log.d("Tag", "Current Positions is null");
-            Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
+               Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
              }
     }
 
@@ -506,9 +501,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 DriverLocation location = dataSnapshot.getValue(DriverLocation.class);
-                LatLng currentLocation = new LatLng(location.getLatitude(),location.getLongitude());
-                Log.d("Tag","Driver Location was returned "+currentLocation.toString());
+                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
                 driverLocation.setPosition(currentLocation);
+                Toast.makeText(getBaseContext(),"Driver changed location ",Toast.LENGTH_LONG).show();
                 driverLocation.setVisible(true);
             }
 
@@ -518,87 +513,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
-    //The real work being done here
-    private void searchForMyRide(final LatLng destination){
-        firebaseRef = new Firebase(Constants.FIREBASE_ROUTES_URL);
-        final List<DriverRoute> driverRoutes= new ArrayList<DriverRoute>();
-        firebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                isDriverNotFound = true;
-                Log.d("Tag", "The database returned " + dataSnapshot.getValue().toString() + " of Type " + dataSnapshot.getClass().getName());
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class), snapshot.getKey());
-                    if (currentPosition != null) {
-                        if (driverRoute.isMatch(currentPosition, destination)) {
-
-                            myDriver = driverRoute;
-                            isDriverNotFound = false;
-                            Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
-                            updateMap();
-                            Log.d("Tag", "Driver found");
-                            break;
-                        } else {
-                            Log.d("Tag", "This driver does not match");
-                        }
-                    } else {
-                        Log.d("Tag", "Current Positions is null");
-                        Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
-                        break;
-                    }
-                }
-
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Log.d("Tag", "loadPost:onCancelled ", firebaseError.toException());
-            }
-        });
-
-        if (isDriverNotFound) {
-            Toast.makeText(getBaseContext(), "You'l be notified of ride soon!", Toast.LENGTH_LONG).show();
-             mActiveListRefListener =  firebaseRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    isDriverNotFound = true;
-                    Log.d("Tag", "The database returned " + dataSnapshot.getValue().toString() + " of Type " + dataSnapshot.getClass().getName());
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class), snapshot.getKey());
-                        if (currentPosition != null) {
-                            if (driverRoute.isMatch(currentPosition, Utils.getClientDestination(getBaseContext()))) {
-                                myDriver = driverRoute;
-                                firebaseRef.removeEventListener(mActiveListRefListener);
-                                isDriverNotFound = false;
-                                Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
-                                updateMap();
-                                break;
-                            } else {
-                                Log.d("Tag", "This driver does not match");
-                            }
-                        } else {
-                            Log.d("Tag", "Current Positions is null");
-                            Toast.makeText(getBaseContext(), "CurrentPosition is null", Toast.LENGTH_LONG).show();
-                            break;
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
-
-                }
-            });
-
-        }
-
-    }
-
-
-
-
 
 
     private void addClient() {
@@ -684,7 +598,6 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             if(Utils.isLocationShared(this)) {
-                Log.d("Tag", "The button to stop has been pressed");
                 if (this.mGoogleApiClient != null) {
                     Intent intent = new Intent(this, CurrentLocationReceiver.class);
                     PendingIntent locationIntent = PendingIntent.getBroadcast(this, 14872, intent, PendingIntent.FLAG_CANCEL_CURRENT);
