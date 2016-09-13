@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity
     private DriverRoute myDriver;
 
     private ValueEventListener mActiveListRefListener;
+    private ValueEventListener mDriverLocationRefListener;
+    Firebase driverLocationRef;
     Firebase firebaseRef;
     List<DriverRoute> driverRoutes;
     Marker driverLocation;
@@ -498,8 +500,8 @@ public class MainActivity extends AppCompatActivity
 
 
     private void ListenForTheDriverLocation(String DriverKey){
-        Firebase database = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(DriverKey);
-        database.addValueEventListener(new ValueEventListener() {
+        driverLocationRef = new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATIONS_URL).child(DriverKey);
+        mDriverLocationRefListener = driverLocationRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 DriverLocation location = dataSnapshot.getValue(DriverLocation.class);
