@@ -284,7 +284,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        makeMyLocationEnabled(mMap);
         Log.d("Tag","OnMapReady has been called");
         MarkerOptions destination = new MarkerOptions().position(new LatLng(-33.9528395,18.2851238))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
@@ -341,7 +340,7 @@ public class MainActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String returnedPolyline = dataSnapshot.getValue(String.class);
                 if(!returnedPolyline.equals(routePolylineCode)){
-                   Toast.makeText(getBaseContext(),"Driver Location Changed", Toast.LENGTH_LONG).show();
+                   Toast.makeText(getBaseContext(),"Driver route Changed", Toast.LENGTH_LONG).show();
                    reset();
                 }
             }
@@ -354,11 +353,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void reset() {
+        Log.d("Tag","Reset Called");
         myDriver = null;
         setClientReceivedDriverKey(this, null);
-        if(mDriverLocationRefListener!=null) {
-            firebaseDriverRouteRef.removeEventListener(mDriverLocationRefListener);
+        if(mDriverRouteListener!=null) {
+            firebaseDriverRouteRef.removeEventListener(mDriverRouteListener);
+            Log.d("Tag", "Route Listener Removed");
         }
+        if(mDriverLocationRefListener!=null){
+            driverLocationRef.removeEventListener(mDriverLocationRefListener);
+            Log.d("Tag", "Location Listener Removed");
+        }
+
         //findMeADriver();
     }
 
@@ -416,6 +422,9 @@ public class MainActivity extends AppCompatActivity
                 makeMyLocationEnabled(mMap);
                 if (Utils.isLocationShared(this)) {
                     requestLocationUpdates();
+                    if(mMap!=null){
+                        makeMyLocationEnabled(mMap);
+                    }
                 }
             }else if(requestCode==PLACE_AUTOCOMPLETE_REQUEST_CODE){
                 buildPlacePickerAutoCompleteDialog();
