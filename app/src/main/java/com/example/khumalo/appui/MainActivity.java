@@ -285,6 +285,7 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         Log.d("Tag","OnMapReady has been called");
+        makeMyLocationEnabled(mMap);
         MarkerOptions destination = new MarkerOptions().position(new LatLng(-33.9528395,18.2851238))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
 
@@ -386,9 +387,7 @@ public class MainActivity extends AppCompatActivity
     private void makeMyLocationEnabled(GoogleMap map){
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
-            PermissionUtils.requestPermission(this, Constants.MY_LOCATION_REQUEST_CODE,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION, true);
+
         }else {
             map.setMyLocationEnabled(true);
         }
@@ -418,14 +417,10 @@ public class MainActivity extends AppCompatActivity
                 android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
                 requestLocationUpdates();
-            } else if(requestCode==Constants.MY_LOCATION_REQUEST_CODE) {
-                makeMyLocationEnabled(mMap);
-                if (Utils.isLocationShared(this)) {
-                    requestLocationUpdates();
-                    if(mMap!=null){
-                        makeMyLocationEnabled(mMap);
-                    }
+                if(mMap!=null){
+                    makeMyLocationEnabled(mMap);
                 }
+
             }else if(requestCode==PLACE_AUTOCOMPLETE_REQUEST_CODE){
                 buildPlacePickerAutoCompleteDialog();
             }else {

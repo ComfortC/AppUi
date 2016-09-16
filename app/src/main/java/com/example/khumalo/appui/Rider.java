@@ -142,7 +142,7 @@ public class Rider extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        makeMyLocationEnabled(mMap);
     }
 
 
@@ -206,8 +206,7 @@ public class Rider extends AppCompatActivity
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission to access the location is missing.
-            PermissionUtils.requestPermission(this, Constants.MY_LOCATION_REQUEST_CODE,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION, true);
+
         }else {
             map.setMyLocationEnabled(true);
         }
@@ -239,7 +238,7 @@ public class Rider extends AppCompatActivity
                 android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (requestCode == CURRENT_PLACE_PERMISSION_REQUEST) {
 
-                    Log.d(Tag, "The Location Access has been Granted");
+                Log.d(Tag, "The Location Access has been Granted");
                     requestLastKnownLocation();
                     if(mMap!=null) {
                         makeMyLocationEnabled(mMap);
@@ -247,8 +246,7 @@ public class Rider extends AppCompatActivity
             } else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                     buildPlacePickerAutoCompleteDialog();
 
-            }else if(requestCode== Constants.MY_LOCATION_REQUEST_CODE){
-                    makeMyLocationEnabled(mMap);
+
             } else {
                 mPermissionDenied =true;
             }
