@@ -37,6 +37,7 @@ public final class Constants {
     public static final String USER_STATUS = "userStatus";
     public static final String LOCATION_SHARE_STATUS = "locationShareStatus";
     public static final String LOCATION_SHARE_STATUS_FLAG = "locationStatusFlag" ;
+    public static final String DESTINATION_FLAG = "destinationSetFlag";
 
     public static final int MY_LOCATION_REQUEST_CODE = 25;
     //Location Services constants

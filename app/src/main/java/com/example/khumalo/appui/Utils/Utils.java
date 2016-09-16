@@ -289,6 +289,19 @@ public class Utils {
     }
 
 
+    public static void setDestinationFlag(Context context, Boolean destinationFlag){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(Constants.DESTINATION_FLAG,destinationFlag);
+        editor.commit();
+    }
+
+    public static boolean isDestinationSet(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getBoolean(Constants.DESTINATION_FLAG,false);
+    }
+
+
 
     public static void setClientDestination(Context context, LatLng destination){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);

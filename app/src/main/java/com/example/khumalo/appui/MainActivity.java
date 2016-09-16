@@ -84,7 +84,9 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import static com.example.khumalo.appui.Utils.Utils.getClientReceivedDriverKey;
+import static com.example.khumalo.appui.Utils.Utils.isDestinationSet;
 import static com.example.khumalo.appui.Utils.Utils.setClientReceivedDriverKey;
+import static com.example.khumalo.appui.Utils.Utils.setDestinationFlag;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -126,6 +128,8 @@ public class MainActivity extends AppCompatActivity
         }
 
 
+
+
         initializeScreen();
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
@@ -145,7 +149,9 @@ public class MainActivity extends AppCompatActivity
                      String size = String.valueOf(driverRoutes.size());
                      Toast.makeText(getBaseContext(),size,Toast.LENGTH_LONG).show();
                  }*/
+                Utils.setDestinationFlag(getBaseContext(),false);
                 buildPlacePickerAutoCompleteDialog();
+
 
            /*     Firebase firebase = new Firebase(Constants.FIREBASE_NOTIFICATION_TEST_MESSAGE);
                 firebase.addValueEventListener(new ValueEventListener() {
@@ -196,7 +202,6 @@ public class MainActivity extends AppCompatActivity
         firebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
            public void onDataChange(DataSnapshot dataSnapshot) {
-               isDriverNotFound = true;
                Log.d("Tag", "The database returned " + dataSnapshot.getValue().toString() + " of Type " + dataSnapshot.getClass().getName());
                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                    DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class), snapshot.getKey());
@@ -219,8 +224,8 @@ public class MainActivity extends AppCompatActivity
 
                   if (driverRoute.isMatch(currentPosition, Utils.getClientDestination(this))) {
                        myDriver = driverRoute;
-                      setClientReceivedDriverKey(this,myDriver.getKey());
-                      isDriverNotFound = false;
+                      setClientReceivedDriverKey(this, myDriver.getKey());
+                      Utils.setDestinationFlag(this, true);
                       Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
                       Log.d("Tag", "Driver found");
                       return true;
@@ -229,6 +234,7 @@ public class MainActivity extends AppCompatActivity
                   }
 
           }
+        setDestinationFlag(this,false);
         return false;
      }
 
@@ -280,11 +286,9 @@ public class MainActivity extends AppCompatActivity
         driverLocation=mMap.addMarker(destination);
         driverLocation.setVisible(false);
         String driverKey = getClientReceivedDriverKey(this);
-        if(driverKey!=null){
+        if(isDestinationSet(this)&&driverKey!=null){
             ListenForTheDriverLocation(driverKey);
         }
-
-
 
     }
 
@@ -319,13 +323,17 @@ public class MainActivity extends AppCompatActivity
     public void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
+
     }
 
 
+
+
+
     /*
-* Create a new location client, using the enclosing class to
-* handle callbacks.
-*/
+    * Create a new location client, using the enclosing class to
+    * handle callbacks.
+    */
     protected synchronized void buildGoogleApiClient() {
         this.mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -441,11 +449,7 @@ public class MainActivity extends AppCompatActivity
                 LatLng destination = place.getLatLng();
                 Utils.setClientDestination(this, destination);
                 findMeADriver();
-
-
-                //searchForMyRide(destination);
-
-                }
+            }
         }
     }
 
