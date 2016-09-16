@@ -83,7 +83,7 @@ public class Rider extends AppCompatActivity
     private static final int PLACE_PICKER_REQUEST = 44;
     private boolean mPermissionDenied = false;
     Location mLastLocation;
-    String current_Place_extra;
+    static String current_Place_extra;
     String destination;
     private ProgressDialog progressDialog;
 
@@ -92,10 +92,10 @@ public class Rider extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rider);
-        if (Utils.isLocationStatusNotSet(this)) {
+        /*if (Utils.isLocationStatusNotSet(this)) {
             Utils.setLocationShareStatus(this, true);
             Utils.setLocationStatuFlag(this,false);
-        }
+        }*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         buildGoogleClient();
@@ -142,7 +142,7 @@ public class Rider extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        makeMyLocationEnabled(mMap);
+
     }
 
 
@@ -241,7 +241,9 @@ public class Rider extends AppCompatActivity
 
                     Log.d(Tag, "The Location Access has been Granted");
                     requestLastKnownLocation();
-
+                    if(mMap!=null) {
+                        makeMyLocationEnabled(mMap);
+                    }
             } else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                     buildPlacePickerAutoCompleteDialog();
 
@@ -428,13 +430,15 @@ public class Rider extends AppCompatActivity
                 e.printStackTrace();
             }
             progressDialog.dismiss();
-            insertRouteIntoTheDatabase(thisLocationToDestination);
-            polylineToDestination = decode(thisLocationToDestination);
-            int lastPosition = polylineToDestination.size() - 1;
-            drawPolylineCurrentPlaceToDestanation(mMap,polylineToDestination);
-            addMarkerToDestination(mMap, polylineToDestination, lastPosition);
-            addMarkerToDestination(mMap,polylineToDestination,0);
-            moveCameraToPosition(mMap,polylineToDestination,lastPosition);
+            if(!thisLocationToDestination.equals("")) {
+                insertRouteIntoTheDatabase(thisLocationToDestination);
+                polylineToDestination = decode(thisLocationToDestination);
+                int lastPosition = polylineToDestination.size() - 1;
+                drawPolylineCurrentPlaceToDestanation(mMap, polylineToDestination);
+                addMarkerToDestination(mMap, polylineToDestination, lastPosition);
+                addMarkerToDestination(mMap, polylineToDestination, 0);
+                moveCameraToPosition(mMap, polylineToDestination, lastPosition);
+            }
         }
     }
 
@@ -544,6 +548,7 @@ public class Rider extends AppCompatActivity
             if(result!=null){
                 double latitude = result.getLastLocation().getLatitude();
                 double longitude = result.getLastLocation().getLongitude();
+                current_Place_extra = String.valueOf(latitude)+","+String.valueOf(longitude);
                 LatLng currentPosition = new LatLng(latitude,longitude);
                 Toast.makeText(context,currentPosition.toString(),Toast.LENGTH_SHORT).show();
                 DriverLocation here = new DriverLocation(latitude, longitude);

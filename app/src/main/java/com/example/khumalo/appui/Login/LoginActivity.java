@@ -20,6 +20,7 @@ import com.example.khumalo.appui.MainActivity;
 import com.example.khumalo.appui.MainEntry;
 import com.example.khumalo.appui.R;
 import com.example.khumalo.appui.Utils.Constants;
+import com.example.khumalo.appui.Utils.Utils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -73,7 +74,7 @@ public class LoginActivity extends BaseActivity {
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putBoolean(Constants.isLoggedIn,true);
                     editor.commit();
-
+                    Utils.setLocationShareStatus(getBaseContext(), true);
                     Intent intent = new Intent(LoginActivity.this,MainEntry.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

@@ -118,10 +118,10 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (Utils.isLocationStatusNotSet(this)) {
+      /*  if (Utils.isLocationStatusNotSet(this)) {
             Utils.setLocationShareStatus(this, true);
             Utils.setLocationStatuFlag(this, false);
-        }
+        }*/
         buildGoogleApiClient();
         driverRoutes = loadRoutes();
         if(Utils.getClientKey(this)==null){
@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity
         mMap = googleMap;
         makeMyLocationEnabled(mMap);
         Log.d("Tag","OnMapReady has been called");
-        MarkerOptions destination = new MarkerOptions().position(Utils.getClientLocation(this))
+        MarkerOptions destination = new MarkerOptions().position(new LatLng(-33.9528395,18.2851238))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
 
         driverLocation=mMap.addMarker(destination);
@@ -340,11 +340,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String returnedPolyline = dataSnapshot.getValue(String.class);
-                if(returnedPolyline.equals(routePolylineCode)){
-                    Log.d("Tag","This is the first time");
-                    Toast.makeText(getBaseContext(),"This is the first time", Toast.LENGTH_LONG).show();
-                }else {
-                    Toast.makeText(getBaseContext(),"The driver changed his route", Toast.LENGTH_LONG).show();
+                if(!returnedPolyline.equals(routePolylineCode)){
+                   Toast.makeText(getBaseContext(),"Driver Location Changed", Toast.LENGTH_LONG).show();
+                   reset();
                 }
             }
 
@@ -353,6 +351,15 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+    }
+
+    private void reset() {
+        myDriver = null;
+        setClientReceivedDriverKey(this, null);
+        if(mDriverLocationRefListener!=null) {
+            firebaseDriverRouteRef.removeEventListener(mDriverLocationRefListener);
+        }
+        //findMeADriver();
     }
 
 
