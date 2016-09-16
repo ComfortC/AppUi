@@ -110,8 +110,9 @@ public class MainActivity extends AppCompatActivity
     Firebase firebaseRef;
     List<DriverRoute> driverRoutes;
     Marker driverLocation;
-
-
+    private  String routePolylineCode;
+    private ValueEventListener mDriverRouteListener;
+    Firebase firebaseDriverRouteRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,21 +221,26 @@ public class MainActivity extends AppCompatActivity
 
 
     private boolean isDriverFound(){
+        if(mDriverRouteListener!=null){
+            firebaseDriverRouteRef.removeEventListener(mActiveListRefListener);
+        }
           for(DriverRoute driverRoute: driverRoutes){
 
                   if (driverRoute.isMatch(currentPosition, Utils.getClientDestination(this))) {
-                       myDriver = driverRoute;
+                      myDriver = driverRoute;
+                      routePolylineCode =myDriver.getRoutePolylineCode();
                       setClientReceivedDriverKey(this, myDriver.getKey());
                       Utils.setDestinationFlag(this, true);
                       Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
                       Log.d("Tag", "Driver found");
+                      listenForChangesInDriverRoute(myDriver.getKey());
                       return true;
                   } else {
                       Log.d("Tag", "This driver does not match");
                   }
 
           }
-        setDestinationFlag(this,false);
+        setDestinationFlag(this, false);
         return false;
      }
 
@@ -328,6 +334,26 @@ public class MainActivity extends AppCompatActivity
 
 
 
+    private void listenForChangesInDriverRoute(String driverKey){
+        firebaseDriverRouteRef = new Firebase(Constants.FIREBASE_ROUTES_URL).child(driverKey);
+        mDriverRouteListener=  firebaseDriverRouteRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String returnedPolyline = dataSnapshot.getValue(String.class);
+                if(returnedPolyline.equals(routePolylineCode)){
+                    Log.d("Tag","This is the first time");
+                    Toast.makeText(getBaseContext(),"This is the first time", Toast.LENGTH_LONG).show();
+                }else {
+                    Toast.makeText(getBaseContext(),"The driver changed his route", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+    }
 
 
     /*
