@@ -333,15 +333,14 @@ public class MainActivity extends AppCompatActivity
 
 
 
-    private void listenForChangesInDriverRoute(String driverKey){
+    public void listenForChangesInDriverRoute(String driverKey){
         firebaseDriverRouteRef = new Firebase(Constants.FIREBASE_ROUTES_URL).child(driverKey);
         mDriverRouteListener=  firebaseDriverRouteRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String returnedPolyline = dataSnapshot.getValue(String.class);
                 if(!returnedPolyline.equals(routePolylineCode)){
-                   Toast.makeText(getBaseContext(),"Driver route Changed", Toast.LENGTH_LONG).show();
-                   reset();
+                    reset();
                 }
             }
 
