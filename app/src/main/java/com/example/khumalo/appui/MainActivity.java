@@ -516,7 +516,14 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    public static class RouteListenerReceiver extends BroadcastReceiver{
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("Tag","The broadcast has been received");
+            Toast.makeText(context,"BroadCast has been received",Toast.LENGTH_LONG).show();
+        }
+    }
 
 
     public static class CurrentLocationReceiver extends BroadcastReceiver {

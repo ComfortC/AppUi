@@ -5,10 +5,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.khumalo.appui.DriverModel.DriverRoute;
+import com.example.khumalo.appui.MainActivity;
 import com.example.khumalo.appui.NotificationCenter.BuildNotification;
 import com.example.khumalo.appui.Utils.Constants;
 import com.example.khumalo.appui.Utils.Utils;
@@ -49,10 +51,12 @@ public class RoutesListener extends Service {
                     if (Utils.getClientLocation(getBaseContext()) != null) {
                         if (driverRoute.isMatch(Utils.getClientLocation(getBaseContext()), Utils.getClientDestination(getBaseContext()))) {
                             myDriver = driverRoute;
-                            setClientReceivedDriverKey(getBaseContext(),myDriver.getKey());
+                            setClientReceivedDriverKey(getBaseContext(), myDriver.getKey());
                             firebaseRef.removeEventListener(mActiveListRefListener);
-                            Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
                             BuildNotification.generateNotification(getBaseContext());
+                            Intent broadcast =  new Intent();
+                            broadcast.setAction("com.example.khumalo.dire.BROADCAST_ACTION");
+                            sendBroadcast(broadcast);
                             stopSelf();
                             break;
                         } else {

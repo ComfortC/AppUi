@@ -6,8 +6,9 @@ package com.example.khumalo.appui.Utils;
 public final class Constants {
 
     public static final String PACKAGE_NAME = "com.example.khumalo.dire";
-    public static final String BROADCAST_ACTION = PACKAGE_NAME + ".BROADCAST_ACTION";
+    public static final String LISTEN_FOR_DRIVER_CHANGES_ACTION = PACKAGE_NAME + ".BROADCAST_ACTION";
     public static final String RESULT_EXTRA = PACKAGE_NAME + ".ACTIVITY_EXTRA";
+
 
 
     public static final String FORECAST_BASE_URL = "https://maps.googleapis.com/maps/api/directions/json?";
@@ -70,6 +71,8 @@ public final class Constants {
 
     public static final String DRIVER_DESTINATION_LATITUDE = "Driver_Destination_latitude";
     public static final String DRIVER_DESTINATION_LANGITUDE = "Driver_Destination_longitude";
+
+
 
     /**
      * Suppress default constructor for noninstantiability

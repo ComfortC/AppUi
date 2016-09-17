@@ -53,7 +53,12 @@
             android:name=".MainActivity$CurrentLocationReceiver"
             android:enabled="true" />
 
+        <receiver android:name=".MainActivity$RouteListenerReceiver">
+         <intent-filter>
+             <action android:name="com.example.khumalo.dire.BROADCAST_ACTION"></action>
+         </intent-filter>
 
+        </receiver>
 
 
 

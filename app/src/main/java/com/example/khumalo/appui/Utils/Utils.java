@@ -303,6 +303,7 @@ public class Utils {
 
 
 
+
     public static void setClientDestination(Context context, LatLng destination){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
