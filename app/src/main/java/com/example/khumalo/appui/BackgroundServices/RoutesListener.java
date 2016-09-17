@@ -20,6 +20,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import static com.example.khumalo.appui.Utils.Utils.setClientReceivedDriverKey;
+import static com.example.khumalo.appui.Utils.Utils.setPolylineString;
 
 /**
  * Created by KHUMALO on 9/12/2016.
@@ -52,6 +53,7 @@ public class RoutesListener extends Service {
                         if (driverRoute.isMatch(Utils.getClientLocation(getBaseContext()), Utils.getClientDestination(getBaseContext()))) {
                             myDriver = driverRoute;
                             setClientReceivedDriverKey(getBaseContext(), myDriver.getKey());
+                            setPolylineString(getBaseContext(),myDriver.getRoutePolylineCode());
                             firebaseRef.removeEventListener(mActiveListRefListener);
                             BuildNotification.generateNotification(getBaseContext());
                             Intent broadcast =  new Intent();

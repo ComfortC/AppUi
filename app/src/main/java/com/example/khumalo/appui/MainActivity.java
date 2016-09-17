@@ -84,9 +84,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import static com.example.khumalo.appui.Utils.Utils.getClientReceivedDriverKey;
+import static com.example.khumalo.appui.Utils.Utils.getPolylineString;
 import static com.example.khumalo.appui.Utils.Utils.isDestinationSet;
+import static com.example.khumalo.appui.Utils.Utils.isRouteListenerOn;
 import static com.example.khumalo.appui.Utils.Utils.setClientReceivedDriverKey;
 import static com.example.khumalo.appui.Utils.Utils.setDestinationFlag;
+import static com.example.khumalo.appui.Utils.Utils.setRouteListenerServiceFlag;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -150,7 +153,8 @@ public class MainActivity extends AppCompatActivity
                      String size = String.valueOf(driverRoutes.size());
                      Toast.makeText(getBaseContext(),size,Toast.LENGTH_LONG).show();
                  }*/
-                Utils.setDestinationFlag(getBaseContext(),false);
+                setRouteListenerServiceFlag(getBaseContext(), false);
+                setDestinationFlag(getBaseContext(), false);
                 buildPlacePickerAutoCompleteDialog();
 
 
@@ -184,6 +188,11 @@ public class MainActivity extends AppCompatActivity
         mLocationRequest.setInterval(5000);
         // Set the fastest update interval to 1 second
         mLocationRequest.setFastestInterval(3000);
+
+        if(isRouteListenerOn(this)){
+            routePolylineCode = getPolylineString(this);
+            listenForChangesInDriverRoute(getClientReceivedDriverKey(this));
+        }
     }
 
     @Override
@@ -222,7 +231,7 @@ public class MainActivity extends AppCompatActivity
 
     private boolean isDriverFound(){
         if(mDriverRouteListener!=null){
-            firebaseDriverRouteRef.removeEventListener(mActiveListRefListener);
+            firebaseDriverRouteRef.removeEventListener(mDriverRouteListener);
         }
           for(DriverRoute driverRoute: driverRoutes){
 
@@ -521,7 +530,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("Tag","The broadcast has been received");
-            Toast.makeText(context,"BroadCast has been received",Toast.LENGTH_LONG).show();
+            setRouteListenerServiceFlag(context,true);
         }
     }
 

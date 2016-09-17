@@ -8,7 +8,7 @@ public final class Constants {
     public static final String PACKAGE_NAME = "com.example.khumalo.dire";
     public static final String LISTEN_FOR_DRIVER_CHANGES_ACTION = PACKAGE_NAME + ".BROADCAST_ACTION";
     public static final String RESULT_EXTRA = PACKAGE_NAME + ".ACTIVITY_EXTRA";
-
+    public static final String SERVICE_RESULT_FLAG = PACKAGE_NAME+"Service_Flag";
 
 
     public static final String FORECAST_BASE_URL = "https://maps.googleapis.com/maps/api/directions/json?";
@@ -32,6 +32,7 @@ public final class Constants {
     public static final String DRIVER_KEY = PACKAGE_NAME+"KEY";
     public static final String CLIENT_KEY = PACKAGE_NAME+"CLIENTKEY";
     public static final String CLIENT_RECEIVED_DRIVER_KEY = PACKAGE_NAME+"Client_Received_Driver_Key";
+    public static final String ROUTE_POLYLINE_STRING = PACKAGE_NAME+"Route_Polyline_Code";
 
     public static final double TOLERANCE_IN_METERS = 300;
 

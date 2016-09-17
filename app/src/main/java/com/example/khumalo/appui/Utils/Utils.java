@@ -302,6 +302,30 @@ public class Utils {
     }
 
 
+    public static void setRouteListenerServiceFlag(Context context, Boolean flag){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(Constants.SERVICE_RESULT_FLAG,flag);
+        editor.commit();
+    }
+
+    public static boolean isRouteListenerOn(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getBoolean(Constants.SERVICE_RESULT_FLAG,false);
+    }
+
+
+    public static void setPolylineString(Context context, String polyline){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.ROUTE_POLYLINE_STRING,polyline);
+        editor.commit();
+    }
+
+    public static String getPolylineString(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(Constants.ROUTE_POLYLINE_STRING,null);
+    }
 
 
     public static void setClientDestination(Context context, LatLng destination){
