@@ -365,7 +365,8 @@ public class MainActivity extends AppCompatActivity
             driverLocationRef.removeEventListener(mDriverLocationRefListener);
             Log.d("Tag", "Location Listener Removed");
         }
-
+        Intent intent = new Intent(this, RoutesListener.class);
+        startService(intent);
         //findMeADriver();
     }
 
@@ -497,8 +498,7 @@ public class MainActivity extends AppCompatActivity
                 if (isDriverFound()) {
                     Intent intent = new Intent(this,DriverValidation.class);
                     startActivity(intent);
-                   // updateMap();
-                } else {
+                   } else {
                     Intent intent = new Intent(this, RoutesListener.class);
                     startService(intent);
                 }
