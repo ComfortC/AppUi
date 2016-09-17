@@ -230,7 +230,6 @@ public class MainActivity extends AppCompatActivity
                       myDriver = driverRoute;
                       routePolylineCode =myDriver.getRoutePolylineCode();
                       setClientReceivedDriverKey(this, myDriver.getKey());
-                      Utils.setDestinationFlag(this, true);
                       Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
                       Log.d("Tag", "Driver found");
                       listenForChangesInDriverRoute(myDriver.getKey());
@@ -240,7 +239,7 @@ public class MainActivity extends AppCompatActivity
                   }
 
           }
-        setDestinationFlag(this, false);
+
         return false;
      }
 
@@ -355,6 +354,13 @@ public class MainActivity extends AppCompatActivity
 
     private void reset() {
         Log.d("Tag","Reset Called");
+        clearData();
+        Intent intent = new Intent(this, RoutesListener.class);
+        startService(intent);
+        //findMeADriver();
+    }
+
+    private void clearData() {
         myDriver = null;
         setClientReceivedDriverKey(this, null);
         if(mDriverRouteListener!=null) {
@@ -365,9 +371,6 @@ public class MainActivity extends AppCompatActivity
             driverLocationRef.removeEventListener(mDriverLocationRefListener);
             Log.d("Tag", "Location Listener Removed");
         }
-        Intent intent = new Intent(this, RoutesListener.class);
-        startService(intent);
-        //findMeADriver();
     }
 
 
@@ -484,6 +487,7 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK ) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
+                Utils.setDestinationFlag(this, true);
                 LatLng destination = place.getLatLng();
                 Utils.setClientDestination(this, destination);
                 findMeADriver();
@@ -499,6 +503,8 @@ public class MainActivity extends AppCompatActivity
                     Intent intent = new Intent(this,DriverValidation.class);
                     startActivity(intent);
                    } else {
+                    mMap.clear();
+                    clearData();
                     Intent intent = new Intent(this, RoutesListener.class);
                     startService(intent);
                 }

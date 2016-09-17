@@ -17,6 +17,8 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import static com.example.khumalo.appui.Utils.Utils.setClientReceivedDriverKey;
+
 /**
  * Created by KHUMALO on 9/12/2016.
  */
@@ -32,7 +34,7 @@ public class RoutesListener extends Service {
     public void onCreate() {
         super.onCreate();
         firebaseRef = new Firebase(Constants.FIREBASE_ROUTES_URL);
-        Log.d("Tag", "RoutesListener Service has been created");
+        //Log.d("Tag", "RoutesListener Service has been created");
     }
 
     @Override
@@ -42,19 +44,19 @@ public class RoutesListener extends Service {
         mActiveListRefListener =  firebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("Tag", "The database returned " + dataSnapshot.getValue().toString() + " of Type " + dataSnapshot.getClass().getName());
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     DriverRoute driverRoute = new DriverRoute(snapshot.getValue(String.class), snapshot.getKey());
                     if (Utils.getClientLocation(getBaseContext()) != null) {
                         if (driverRoute.isMatch(Utils.getClientLocation(getBaseContext()), Utils.getClientDestination(getBaseContext()))) {
                             myDriver = driverRoute;
+                            setClientReceivedDriverKey(getBaseContext(),myDriver.getKey());
                             firebaseRef.removeEventListener(mActiveListRefListener);
                             Toast.makeText(getBaseContext(), "Your ride almost here", Toast.LENGTH_LONG).show();
                             BuildNotification.generateNotification(getBaseContext());
                             stopSelf();
                             break;
                         } else {
-                            Log.d("Tag", "This driver does not match");
+
                         }
                     } else {
                         Log.d("Tag", "Current Positions is null");
