@@ -19,6 +19,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/map"
         android:layout_alignEnd="@+id/map"
-        android:layout_margin="@dimen/abc_dialog_padding_material"
+        android:layout_margin="16dp"
         app:backgroundTint="@color/primary" />
 </RelativeLayout>
