@@ -5,23 +5,20 @@ package com.example.khumalo.appui.ClientModel;
  */
 public class ClientProfile {
     private String name;
-    private String surname;
+
     // private String Area;
 
 
     public ClientProfile() {
     }
 
-    public ClientProfile(String name, String surname) {
+    public ClientProfile(String name) {
         this.name = name;
-        this.surname = surname;
-    }
+       }
 
     public String getName() {
         return name;
     }
 
-    public String getSurname() {
-        return surname;
-    }
+
 }

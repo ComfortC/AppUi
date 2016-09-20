@@ -36,6 +36,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
 
+import static com.example.khumalo.appui.Utils.Utils.saveClientFullName;
+
 public class LoginActivity extends BaseActivity {
 
 
@@ -75,6 +77,7 @@ public class LoginActivity extends BaseActivity {
                     editor.putBoolean(Constants.isLoggedIn,true);
                     editor.commit();
                     Utils.setLocationShareStatus(getBaseContext(), true);
+                    saveClientFullName(getBaseContext(),user.getDisplayName());
                     Intent intent = new Intent(LoginActivity.this,MainEntry.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

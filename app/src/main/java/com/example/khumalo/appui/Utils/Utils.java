@@ -259,12 +259,12 @@ public class Utils {
         editor.commit();
     }
 
-    public static boolean isLocationStatusNotSet(Context context){
+    public static boolean isClientNameNotSet(Context context){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getBoolean(Constants.LOCATION_SHARE_STATUS_FLAG,true);
     }
 
-    public static void setLocationStatuFlag(Context context, Boolean flag){
+    public static void setClientNameFlag(Context context, Boolean flag){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean(Constants.LOCATION_SHARE_STATUS_FLAG,flag);
@@ -362,6 +362,18 @@ public class Utils {
         return new LatLng(lat,lon);
     }
 
+    public static void saveClientFullName(Context context, String fullName){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.CLIENT_FULL_NAME,fullName);
+        editor.commit();
+    }
+
+
+    public static String getClientFullName(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(Constants.CLIENT_FULL_NAME,"");
+    }
 
 
 

@@ -39,6 +39,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -78,15 +79,19 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import static com.example.khumalo.appui.Utils.Utils.getClientFullName;
 import static com.example.khumalo.appui.Utils.Utils.getClientReceivedDriverKey;
 import static com.example.khumalo.appui.Utils.Utils.getPolylineString;
+import static com.example.khumalo.appui.Utils.Utils.isClientNameNotSet;
 import static com.example.khumalo.appui.Utils.Utils.isDestinationSet;
 import static com.example.khumalo.appui.Utils.Utils.isRouteListenerOn;
+import static com.example.khumalo.appui.Utils.Utils.saveClientFullName;
 import static com.example.khumalo.appui.Utils.Utils.setClientReceivedDriverKey;
 import static com.example.khumalo.appui.Utils.Utils.setDestinationFlag;
 import static com.example.khumalo.appui.Utils.Utils.setRouteListenerServiceFlag;
@@ -117,19 +122,18 @@ public class MainActivity extends AppCompatActivity
     private ValueEventListener mDriverRouteListener;
     Firebase firebaseDriverRouteRef;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-      /*  if (Utils.isLocationStatusNotSet(this)) {
-            Utils.setLocationShareStatus(this, true);
-            Utils.setLocationStatuFlag(this, false);
-        }*/
+
         buildGoogleApiClient();
         driverRoutes = loadRoutes();
         if(Utils.getClientKey(this)==null){
             addClient();
         }
+
 
 
 
@@ -140,6 +144,8 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
+
 
     private void initializeScreen() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -180,6 +186,12 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        View hView =  navigationView.getHeaderView(0);
+        TextView nav_user = (TextView)hView.findViewById(R.id.client_full_name);
+
+        nav_user.setText(getClientFullName(this));
+
         navigationView.setNavigationItemSelectedListener(this);
         mLocationRequest = LocationRequest.create();
         // Use high accuracy
@@ -285,6 +297,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -330,7 +343,7 @@ public class MainActivity extends AppCompatActivity
     public void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
-    }
+        }
 
 
     @Override
@@ -586,7 +599,7 @@ public class MainActivity extends AppCompatActivity
         Firebase keyRef = database.push();
         String keyID = keyRef.getKey();
         Utils.setClientKey(keyID, this);
-        ClientProfile clientProfile = new ClientProfile("Kamatoto","Chinos");
+        ClientProfile clientProfile = new ClientProfile(getClientFullName(this));
         keyRef.setValue(clientProfile);
     }
 

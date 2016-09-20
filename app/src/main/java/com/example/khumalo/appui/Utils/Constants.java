@@ -64,8 +64,10 @@ public final class Constants {
     public static final int AVAILABLE_DRIVER_NOTIFICATION = 133;
 
 
+
     public static final String CLIENT_DESTINATION_LATITUDE = "Client_Destination_latitude";
     public static final String CLIENT_DESTINATION_LONGITUDE = "Client_Destination_longitude";
+    public static final String CLIENT_FULL_NAME =  "Clientele_full_name";
 
     public static final String CLIENT_LOCATION_LATITUDE = "Client_Location_latitude";
     public static final String CLIENT_LOCATION_LONGITUDE = "Client_Location_longitude";
