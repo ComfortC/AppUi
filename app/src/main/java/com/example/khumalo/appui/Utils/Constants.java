@@ -76,6 +76,8 @@ public final class Constants {
     public static final String DRIVER_DESTINATION_LANGITUDE = "Driver_Destination_longitude";
 
 
+    public static final String CLIENT_IMAGE_URI = "Client_Image_Uri";
+
 
     /**
      * Suppress default constructor for noninstantiability

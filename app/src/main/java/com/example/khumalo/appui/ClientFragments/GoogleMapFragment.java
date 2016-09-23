@@ -276,7 +276,7 @@ public class GoogleMapFragment extends Fragment implements
         Firebase keyRef = database.push();
         String keyID = keyRef.getKey();
         Utils.setClientKey(keyID, getContext());
-        ClientProfile clientProfile = new ClientProfile("Kamatoto","Chinos");
+        ClientProfile clientProfile = new ClientProfile("Comfort Chinondiwana");
         keyRef.setValue(clientProfile);
     }
 

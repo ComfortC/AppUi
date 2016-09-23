@@ -3,6 +3,7 @@ package com.example.khumalo.appui.Login;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +38,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
 
 import static com.example.khumalo.appui.Utils.Utils.saveClientFullName;
+import static com.example.khumalo.appui.Utils.Utils.saveImageUriString;
 
 public class LoginActivity extends BaseActivity {
 
@@ -77,7 +79,9 @@ public class LoginActivity extends BaseActivity {
                     editor.putBoolean(Constants.isLoggedIn,true);
                     editor.commit();
                     Utils.setLocationShareStatus(getBaseContext(), true);
-                    saveClientFullName(getBaseContext(),user.getDisplayName());
+                    saveClientFullName(getBaseContext(), user.getDisplayName());
+                    Uri uri = user.getPhotoUrl();
+                    saveImageUriString(getBaseContext(),uri.toString());
                     Intent intent = new Intent(LoginActivity.this,MainEntry.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

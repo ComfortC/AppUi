@@ -377,6 +377,20 @@ public class Utils {
 
 
 
+    public static void saveImageUriString(Context context, String UriString){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.CLIENT_IMAGE_URI,UriString);
+        editor.commit();
+    }
+
+
+    public static String getImageUriString(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(Constants.CLIENT_IMAGE_URI,"");
+    }
+
+
 
 
     //Determining if they can share

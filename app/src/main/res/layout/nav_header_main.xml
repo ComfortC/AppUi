@@ -12,11 +12,10 @@
 
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:elevation="4dp"
         android:src="@android:drawable/sym_def_app_icon"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-
         android:id="@+id/circleView"
 
         />

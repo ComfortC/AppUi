@@ -39,10 +39,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
 import com.example.khumalo.appui.BackgroundServices.RoutesListener;
 import com.example.khumalo.appui.ClientFragments.GoogleMapFragment;
 import com.example.khumalo.appui.ClientModel.ClientProfile;
@@ -87,6 +89,7 @@ import java.util.List;
 
 import static com.example.khumalo.appui.Utils.Utils.getClientFullName;
 import static com.example.khumalo.appui.Utils.Utils.getClientReceivedDriverKey;
+import static com.example.khumalo.appui.Utils.Utils.getImageUriString;
 import static com.example.khumalo.appui.Utils.Utils.getPolylineString;
 import static com.example.khumalo.appui.Utils.Utils.isClientNameNotSet;
 import static com.example.khumalo.appui.Utils.Utils.isDestinationSet;
@@ -189,7 +192,9 @@ public class MainActivity extends AppCompatActivity
 
         View hView =  navigationView.getHeaderView(0);
         TextView nav_user = (TextView)hView.findViewById(R.id.client_full_name);
-
+        ImageView profilePic = (ImageView)hView.findViewById(R.id.circleView);
+        Log.d("Tag","The image string is"+ getImageUriString(this));
+        Glide.with(this).load(getImageUriString(this)).into(profilePic);
         nav_user.setText(getClientFullName(this));
 
         navigationView.setNavigationItemSelectedListener(this);
