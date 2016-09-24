@@ -9,9 +9,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
- import java.util.Calendar;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Calendar;
+
+import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -45,6 +49,8 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.example.khumalo.appui.BackgroundServices.RoutesListener;
 import com.example.khumalo.appui.ClientFragments.GoogleMapFragment;
 import com.example.khumalo.appui.ClientModel.ClientProfile;
@@ -80,8 +86,13 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -124,7 +135,7 @@ public class MainActivity extends AppCompatActivity
     private  String routePolylineCode;
     private ValueEventListener mDriverRouteListener;
     Firebase firebaseDriverRouteRef;
-
+    FirebaseStorage FireStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +164,7 @@ public class MainActivity extends AppCompatActivity
     private void initializeScreen() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        FireStorage = FirebaseStorage.getInstance();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,8 +204,16 @@ public class MainActivity extends AppCompatActivity
         View hView =  navigationView.getHeaderView(0);
         TextView nav_user = (TextView)hView.findViewById(R.id.client_full_name);
         ImageView profilePic = (ImageView)hView.findViewById(R.id.circleView);
-        Log.d("Tag","The image string is"+ getImageUriString(this));
-        Glide.with(this).load(getImageUriString(this)).into(profilePic);
+        Glide.with(this).load(getImageUriString(this))
+                .asBitmap()
+                .into(new BitmapImageViewTarget(profilePic){
+            @Override
+            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                super.onResourceReady(bitmap, anim);
+                saveImageToFireBaseDatabase(bitmap);
+            }
+        });
+
         nav_user.setText(getClientFullName(this));
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -210,6 +229,30 @@ public class MainActivity extends AppCompatActivity
             routePolylineCode = getPolylineString(this);
             listenForChangesInDriverRoute(getClientReceivedDriverKey(this));
         }
+    }
+
+    private void saveImageToFireBaseDatabase(Bitmap profilePic) {
+        StorageReference storageRef = FireStorage.getReferenceFromUrl(Constants.FIREBASE_STORAGE_URL).child("images");
+        // Get the data from an ImageView as bytes
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        profilePic.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = storageRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                Log.d("Tag","The firebase Image uri is "+downloadUrl);
+            }
+        });
     }
 
     @Override

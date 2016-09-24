@@ -20,6 +20,8 @@ public final class Constants {
 
 
     public static final String FIREBASE_URL = "https://handy-sensor-136618.firebaseio.com/";
+    public static final String FIREBASE_STORAGE_URL = "gs://handy-sensor-136618.appspot.com";
+
     public static final String DRIVERS_URL = "Drivers";
     public static final String LOCATIONS_URL = "Locations";
     public static final String ROUTES_URL= "Routes";
