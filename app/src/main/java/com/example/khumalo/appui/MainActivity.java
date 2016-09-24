@@ -110,6 +110,7 @@ import static com.example.khumalo.appui.Utils.Utils.isClientNameNotSet;
 import static com.example.khumalo.appui.Utils.Utils.isDestinationSet;
 import static com.example.khumalo.appui.Utils.Utils.isRouteListenerOn;
 import static com.example.khumalo.appui.Utils.Utils.saveClientFullName;
+import static com.example.khumalo.appui.Utils.Utils.saveDriverProfilePicPath;
 import static com.example.khumalo.appui.Utils.Utils.setClientReceivedDriverKey;
 import static com.example.khumalo.appui.Utils.Utils.setDestinationFlag;
 import static com.example.khumalo.appui.Utils.Utils.setRouteListenerServiceFlag;
@@ -210,15 +211,15 @@ public class MainActivity extends AppCompatActivity
         ImageView profilePic = (ImageView)hView.findViewById(R.id.circleView);
         Glide.with(this).load(getImageUriString(this))
                 .asBitmap()
-                .into(new BitmapImageViewTarget(profilePic){
-            @Override
-            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                super.onResourceReady(bitmap, anim);
-                saveImageToFireBaseDatabase(bitmap);
-            }
-        });
+                .into(new BitmapImageViewTarget(profilePic) {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                        super.onResourceReady(bitmap, anim);
+                        saveImageToFireBaseDatabase(bitmap);
+                    }
+                });
 
-        downloadDriverProfilePic();
+
 
         nav_user.setText(getClientFullName(this));
 
@@ -237,30 +238,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void downloadDriverProfilePic() {
-        StorageReference storageRef = FireStorage.getReferenceFromUrl(Constants.FIREBASE_STORAGE_URL);
-        StorageReference pathReference = storageRef.child("alicia_keys.jpg");
-        try {
-            File file = File.createTempFile("images","jpg");
-            Log.d("Tag", "File path is "+ file.getAbsolutePath());
-           pathReference.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    // Local temp file has been created
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                    Log.d("Tag","File could not be downloaded "+exception.toString());
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("Tag","File could not be created");
-        }
 
-    }
 
     private void saveImageToFireBaseDatabase(Bitmap profilePic) {
         StorageReference storageRef = FireStorage.getReferenceFromUrl(Constants.FIREBASE_STORAGE_URL).child("images");
@@ -372,6 +350,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_driver_profile){
             Intent intent = new Intent(this,DriverValidation.class);
+            intent.putExtra(Constants.DRIVER_PROFILE_VALIDATION_EXTRA,false);
             startActivity(intent);
         }
 
@@ -601,6 +580,7 @@ public class MainActivity extends AppCompatActivity
             if (driverRoutes != null) {
                 if (isDriverFound()) {
                     Intent intent = new Intent(this,DriverValidation.class);
+                    intent.putExtra(Constants.DRIVER_PROFILE_VALIDATION_EXTRA,true);
                     startActivity(intent);
                    } else {
                     mMap.clear();

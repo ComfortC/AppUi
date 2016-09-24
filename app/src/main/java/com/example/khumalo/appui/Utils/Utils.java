@@ -385,6 +385,19 @@ public class Utils {
     }
 
 
+    public static void saveDriverProfilePicPath(Context context, String path){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.DRIVER_PROFILE_PIC_PATH,path);
+        editor.commit();
+    }
+
+    public static String getDriverProfilePicPath(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(Constants.DRIVER_PROFILE_PIC_PATH,"");
+    }
+
+
     public static String getImageUriString(Context context){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString(Constants.CLIENT_IMAGE_URI,"");

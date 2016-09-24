@@ -19,8 +19,15 @@ import com.bumptech.glide.Glide;
 import com.example.khumalo.appui.Utils.Constants;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
+import java.io.IOException;
+
+import static com.example.khumalo.appui.Utils.Utils.getDriverProfilePicPath;
+import static com.example.khumalo.appui.Utils.Utils.saveDriverProfilePicPath;
 
 public class DriverValidation extends AppCompatActivity {
 
@@ -35,8 +42,15 @@ public class DriverValidation extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         FireStorage = FirebaseStorage.getInstance();
 
+        if(getIntent().getBooleanExtra(Constants.DRIVER_PROFILE_VALIDATION_EXTRA,false)){
+            downloadDriverProfilePic();
+        }else{
+            loadBackdrop();
+        }
+
         NotificationManager nMgr = (NotificationManager) getSystemService(getBaseContext().NOTIFICATION_SERVICE);
         nMgr.cancel(Constants.AVAILABLE_DRIVER_NOTIFICATION);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -49,31 +63,44 @@ public class DriverValidation extends AppCompatActivity {
 
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle("Comfort");
+        collapsingToolbar.setTitle("Alicia Keys");
 
-        loadBackdrop();
-        RatingBar ratingBar = (RatingBar)findViewById(R.id.driver_ratings);
+
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.driver_ratings);
         ratingBar.setRating(4);
     }
 
     private void loadBackdrop() {
+        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+        Glide.with(getBaseContext()).load(getDriverProfilePicPath(this)).centerCrop().into(imageView);
+        // Got the download URL for 'users/me/profile.png'
+    }
+
+    private void downloadDriverProfilePic() {
         StorageReference storageRef = FireStorage.getReferenceFromUrl(Constants.FIREBASE_STORAGE_URL);
         StorageReference pathReference = storageRef.child("alicia_keys.jpg");
-
-        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-       pathReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-           @Override
-           public void onSuccess(Uri uri) {
-               Glide.with(getBaseContext()).load(uri).centerCrop().into(imageView);
-            // Got the download URL for 'users/me/profile.png'
-           }
-       }).addOnFailureListener(new OnFailureListener() {
-           @Override
-           public void onFailure(@NonNull Exception exception) {
-               Log.d("Tag", "Download failed caz " + exception.toString());
-           }
-       });
-
+        try {
+            File file = File.createTempFile("images","jpg");
+            saveDriverProfilePicPath(this,file.getAbsolutePath());
+            pathReference.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    // Local temp file has been created
+                    if (taskSnapshot.getBytesTransferred() == taskSnapshot.getTotalByteCount()) {
+                        loadBackdrop();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d("Tag", "File could not be downloaded " + exception.toString());
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("Tag","File could not be created");
+        }
 
     }
 }
