@@ -64,6 +64,7 @@ public class BuildNotification  {
                 .setSound(new RingtoneManager(context).getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         Intent intent = new Intent(context, DriverValidation.class);
+        intent.putExtra(Constants.DRIVER_PROFILE_VALIDATION_EXTRA,true);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
 
         stackBuilder.addParentStack(DriverValidation.class);

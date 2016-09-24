@@ -363,13 +363,25 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Log.d("Tag","OnMapReady has been called");
+        Log.d("Tag", "OnMapReady has been called");
         makeMyLocationEnabled(mMap);
-        MarkerOptions destination = new MarkerOptions().position(new LatLng(-33.9528395,18.2851238))
+        MarkerOptions destination = new MarkerOptions().position(new LatLng(-33.9528395, 18.2851238))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
 
         driverLocation=mMap.addMarker(destination);
         driverLocation.setVisible(false);
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if (marker.equals(driverLocation)) {
+                    Intent intent = new Intent(getBaseContext(), DriverValidation.class);
+                    intent.putExtra(Constants.DRIVER_PROFILE_VALIDATION_EXTRA, false);
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
+            }
+        });
         String driverKey = getClientReceivedDriverKey(this);
         if(isDestinationSet(this)&&driverKey!=null){
             ListenForTheDriverLocation(driverKey);
@@ -642,6 +654,7 @@ public class MainActivity extends AppCompatActivity
                 LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
                 Toast.makeText(getBaseContext(),"Driver changed location ",Toast.LENGTH_LONG).show();
                 driverLocation.setVisible(true);
+
                 MarkerAnimation.animateMarkerToHC(driverLocation,currentLocation,new LatLngInterpolator.Linear());
             }
 
