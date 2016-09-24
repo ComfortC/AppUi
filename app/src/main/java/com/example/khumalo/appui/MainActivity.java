@@ -13,8 +13,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 
+import android.location.Location;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -90,6 +93,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -214,6 +218,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        downloadDriverProfilePic();
+
         nav_user.setText(getClientFullName(this));
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -229,6 +235,31 @@ public class MainActivity extends AppCompatActivity
             routePolylineCode = getPolylineString(this);
             listenForChangesInDriverRoute(getClientReceivedDriverKey(this));
         }
+    }
+
+    private void downloadDriverProfilePic() {
+        StorageReference storageRef = FireStorage.getReferenceFromUrl(Constants.FIREBASE_STORAGE_URL);
+        StorageReference pathReference = storageRef.child("alicia_keys.jpg");
+        try {
+            File file = File.createTempFile("images","jpg");
+            Log.d("Tag", "File path is "+ file.getAbsolutePath());
+           pathReference.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    // Local temp file has been created
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d("Tag","File could not be downloaded "+exception.toString());
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("Tag","File could not be created");
+        }
+
     }
 
     private void saveImageToFireBaseDatabase(Bitmap profilePic) {
