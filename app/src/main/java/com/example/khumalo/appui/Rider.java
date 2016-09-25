@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
@@ -27,8 +28,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.example.khumalo.appui.BackgroundServices.BackgroundLocationService;
 import com.example.khumalo.appui.DriverModel.DriverLocation;
 import com.example.khumalo.appui.DriverModel.DriverProfile;
@@ -68,6 +74,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import static com.example.khumalo.appui.Utils.Utils.getClientFullName;
+import static com.example.khumalo.appui.Utils.Utils.getImageUriString;
 import static com.example.khumalo.appui.Utils.Utils.getPolyLineCode;
 import static com.example.khumalo.appui.Utils.Utils.isLocationShared;
 import static com.google.maps.android.PolyUtil.decode;
@@ -105,8 +113,8 @@ public class Rider extends AppCompatActivity
                 if(mMap!=null){
                     mMap.clear();
                 }
-                addDriver();
-               /* buildPlacePickerAutoCompleteDialog();*/
+
+                buildPlacePickerAutoCompleteDialog();
             }
         });
 
@@ -117,6 +125,22 @@ public class Rider extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View hView =  navigationView.getHeaderView(0);
+        TextView nav_user = (TextView)hView.findViewById(R.id.driver_full_name);
+        ImageView profilePic = (ImageView)hView.findViewById(R.id.circleView);
+        Glide.with(this).load(getImageUriString(this))
+                .asBitmap()
+                .into(new BitmapImageViewTarget(profilePic) {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                        super.onResourceReady(bitmap, anim);
+                       // saveImageToFireBaseDatabase(bitmap);
+                    }
+                });
+
+
+
+        nav_user.setText(getClientFullName(this));
         navigationView.setNavigationItemSelectedListener(this);
 
         getSupportActionBar().setDisplayShowTitleEnabled(true);
