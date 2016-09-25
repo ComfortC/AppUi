@@ -105,7 +105,8 @@ public class Rider extends AppCompatActivity
                 if(mMap!=null){
                     mMap.clear();
                 }
-                buildPlacePickerAutoCompleteDialog();
+                addDriver();
+               /* buildPlacePickerAutoCompleteDialog();*/
             }
         });
 
@@ -130,7 +131,7 @@ public class Rider extends AppCompatActivity
         Firebase keyRef = database.push();
         String keyID = keyRef.getKey();
         Utils.setDriverKey(keyID, this);
-        DriverProfile driver = new DriverProfile("Comfort","Chinondiwana");
+        DriverProfile driver = new DriverProfile("Comfort","Chinondiwana","CY 30052",074532255, "sssss");
         keyRef.setValue(driver);
     }
 
