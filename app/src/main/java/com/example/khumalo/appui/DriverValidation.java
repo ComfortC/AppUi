@@ -77,8 +77,7 @@ public class DriverValidation extends AppCompatActivity {
     }
 
     private void downloadDriverProfilePic() {
-        StorageReference storageRef = FireStorage.getReferenceFromUrl(Constants.FIREBASE_STORAGE_URL);
-        StorageReference pathReference = storageRef.child("alicia_keys.jpg");
+        StorageReference pathReference = FireStorage.getReferenceFromUrl("gs://handy-sensor-136618.appspot.com/alicia_keys.jpg");
         try {
             File file = File.createTempFile("images","jpg");
             saveDriverProfilePicPath(this,file.getAbsolutePath());
