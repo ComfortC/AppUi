@@ -166,6 +166,7 @@ public class Rider extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setTrafficEnabled(true);
         makeMyLocationEnabled(mMap);
     }
 

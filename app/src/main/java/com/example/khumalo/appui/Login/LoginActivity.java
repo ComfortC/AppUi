@@ -82,6 +82,7 @@ public class LoginActivity extends BaseActivity {
                     saveClientFullName(getBaseContext(), user.getDisplayName());
                     Uri uri = user.getPhotoUrl();
                     saveImageUriString(getBaseContext(),uri.toString());
+                    onCheckBoxClicked();
                     Intent intent = new Intent(LoginActivity.this,MainEntry.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -103,7 +104,6 @@ public class LoginActivity extends BaseActivity {
         /* Setup the progress dialog that is displayed later when authenticating with Firebase */
         mAuthProgressDialog = new ProgressDialog(this);
         mAuthProgressDialog.setTitle(getString(R.string.progress_dialog_loading));
-        mAuthProgressDialog.setMessage(getString(R.string.progress_dialog_authenticating_with_firebase));
         mAuthProgressDialog.setCancelable(false);
 
         setupGoogleSignIn();
@@ -196,8 +196,9 @@ public class LoginActivity extends BaseActivity {
 
     }
 
-    public void onCheckBoxClicked(View view) {
-        boolean isChecked = ((CheckBox) view).isChecked();
+    public void onCheckBoxClicked() {
+        boolean isChecked = true;
+//        boolean isChecked = ((CheckBox) view).isChecked();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(Constants.USER_STATUS, isChecked);
